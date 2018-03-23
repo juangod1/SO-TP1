@@ -14,6 +14,8 @@ void * createBuffer(size_t size, int num_of_slaves){
     int visibility = MAP_ANONYMOUS | MAP_SHARED;
     void * buffer = mmap(NULL, size, protection, visibility, 0, 0); // MAN PAGE: If addr is NULL, then the kernel chooses the address at which to create the mapping.
 
+    buffer = createSemaphore(buffer, num_of_slaves);
+
     return buffer;
 }
 
