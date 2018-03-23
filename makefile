@@ -1,22 +1,43 @@
+####################################
+####         SETUP              ####
+####################################
+
 CC = gcc
 CC_FLAGS = -Wall
 
 SOURCES = $(wildcard *.c)
-OBJECTS = $(SOURCES:.c=.o)
-SOURCES_TEST = $(wildcard Tests/*.c)
-OBJECTS_TEST = $(SOURCES_TEST:.c=.o)
-EXEC = BINARY_NAME_HERE
+SOURCES_AUX := $(SOURCES)
+SOURCES = $(filter-out $(SECONDARY_BINARIES_SOURCES),$(SOURCES_AUX))
 
-all: clean test
+OBJECTS = $(foreach source, $(SOURCES:.c=.o), Binaries/$(source))
 
-no_test: $(OBJECTS)
-	$(CC) $(OBJECTS) -o $(EXEC)
- 
-clean:
-	rm -f $(EXEC) $(OBJECTS)
+EXEC = run
 
-test: clean $(OBJECTS) $(OBJECTS_TEST)
-	$(CC) $(OBJECTS) $(OBJECTS_TEST) -o $(EXEC)
+SECONDARY_BINARIES_SOURCES =
+SECONDARY_BINARIES_OBJECTS = $(foreach source, $(SECONDARY_BINARIES_SOURCES:.c=.o), Binaries/$(source))
 
-%.o: %.c Test/%.c
+
+####################################
+####      COMPILATION           ####
+####################################
+
+Binaries/%.o: %.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
+
+%.o: %.c
+	$(CC) -c $(CC_FLAGS) $< -o $@
+
+all: clean main_binary secondary_binaries
+
+clean:
+	rm -f Binaries/*
+
+main_binary: clean $(OBJECTS)
+			$(CC) $(OBJECTS) -o Binaries/$(EXEC)
+
+
+secondary_binaries: $(SECONDARY_BINARIES_OBJECTS)
+	@- $(foreach file,$(SECONDARY_BINARIES_OBJECTS), \
+					echo Compiled $(file) as a separate binary file: $(subst .o,,$(file));\
+					$(CC) -o $(subst .o,,$(file)) $(file) ; \
+	    )
