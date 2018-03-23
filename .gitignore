@@ -1,6 +1,11 @@
 #Binaries
 Binaries/*
 
+#CLion
+cmake-build-debug/*
+.idea/*
+CMakeLists.txt
+
 # Prerequisites
 *.d
 
