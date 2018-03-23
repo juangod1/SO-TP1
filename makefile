@@ -35,7 +35,7 @@ clean:
 main_binary: clean $(OBJECTS)
 			$(CC) $(OBJECTS) -o Binaries/$(EXEC)
 
-secondary_binaries: $(SECONDARY_BINARIES_OBJECTS) # Iterates over binaries that do no tbelong to the main process compiling them separately
+secondary_binaries: $(SECONDARY_BINARIES_OBJECTS) # Iterates over binaries that do not belong to the main process compiling them separately
 	@- $(foreach file,$(SECONDARY_BINARIES_OBJECTS), \
 					echo Compiled $(file) as a separate binary file: $(subst .o,,$(file));\
 					$(CC) -o $(subst .o,,$(file)) $(file) ; \
