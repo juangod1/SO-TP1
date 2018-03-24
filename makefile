@@ -28,7 +28,7 @@ Binaries/%.o: %.c
 %.o: %.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
 
-all: clean main_binary secondary_binaries
+all: binaries_setup clean main_binary secondary_binaries
 
 clean:
 	rm -f Binaries/*
@@ -41,3 +41,6 @@ secondary_binaries: $(SECONDARY_BINARIES_OBJECTS) # Iterates over binaries that 
 					echo Compiled $(file) as a separate binary file: $(subst .o,,$(file));\
 					$(CC) -o $(subst .o,,$(file)) $(file) Binaries/messageQueue.o $(LINKER_OPTIONS); \
 	    )
+
+binaries_setup:
+	if [ -d "Binaries" ]; then echo "Binaries directory found, proceeding..."; else mkdir Binaries; fi
