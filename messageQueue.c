@@ -36,7 +36,7 @@ void getMessage(mqd_t queueDescriptor, size_t bufferSize, char * buffer){
     }
 }
 
-void sendMessage(char * msg, size_t msgLen,mqd_t queueDescriptor){
+void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor){
     if(mq_send(queueDescriptor,msg,msgLen,0)==-1)
         perror("mq_send ERROR");
 }
