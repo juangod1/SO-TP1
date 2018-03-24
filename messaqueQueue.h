@@ -5,11 +5,12 @@
 #ifndef SO_TP1_MESSAQUEQUEUE_H
 #define SO_TP1_MESSAQUEQUEUE_H
 
-struct message {
-    long messageNumber;
-    char hash[32];
-} messageCDT;
+#include <mqueue.h>
+#include <stddef.h>
 
-typedef struct messageCDT * message;
+mqd_t createQueue(const char* mqName, long messageSize, long maxMessages);
+void getMessage(mqd_t queueDescriptor, size_t messageSize, char * buffer);
+void sendMessage(char * msg, size_t msgLen,mqd_t queueDescriptor);
+void closeMessageQueue(mqd_t queueDescriptor);
 
 #endif //SO_TP1_MESSAQUEQUEUE_H

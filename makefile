@@ -33,7 +33,7 @@ clean:
 	rm -f Binaries/*
 
 main_binary: clean $(OBJECTS)
-			$(CC) $(OBJECTS) -o Binaries/$(EXEC)
+			$(CC) $(OBJECTS) -o Binaries/$(EXEC) -lrt
 
 secondary_binaries: $(SECONDARY_BINARIES_OBJECTS) # Iterates over binaries that do not belong to the main process compiling them separately
 	@- $(foreach file,$(SECONDARY_BINARIES_OBJECTS), \
