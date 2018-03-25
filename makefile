@@ -12,7 +12,7 @@ SOURCES = $(filter-out $(VIEW),$(filter-out $(SLAVE),$(SOURCES_AUX))) # Removes 
 OBJECTS = $(foreach source, $(SOURCES:.c=.o), Binaries/$(source)) # Appends string for object files to be stored in Binaries directory
 EXEC = run # Binary name
 
-SLAVE = slave.c
+SLAVE = slave.c testSlave.c
 SLAVE_OBJECTS = $(foreach source, $(SLAVE:.c=.o), Binaries/$(source)) # Same as line 12
 EXEC_SLAVE = slave # Binary name
 
@@ -39,10 +39,10 @@ main_binary: clean $(OBJECTS)
 	$(CC) $(OBJECTS) -o Binaries/$(EXEC) $(LINKER_OPTIONS)
 
 slave: $(SLAVE_OBJECTS)
-	$(CC) $(SLAVE_OBJECTS) -o Binaries/$(EXEC_SLAVE) $(LINKER_OPTIONS)
+	$(CC) $(SLAVE_OBJECTS) Binaries/testLib.o Binaries/messageQueue.o -o Binaries/$(EXEC_SLAVE) $(LINKER_OPTIONS)
 
 view: $(VIEW_OBJECTS)
-	$(CC) $(VIEW_OBJECTS) -o Binaries/$(EXEC_VIEW) $(LINKER_OPTIONS)
+	$(CC) $(VIEW_OBJECTS) Binaries/testLib.o Binaries/messageQueue.o -o Binaries/$(EXEC_VIEW) $(LINKER_OPTIONS)
 
 binaries_setup:
 	if [ -d "Binaries" ]; then echo "Binaries directory found, proceeding..."; else mkdir Binaries; fi

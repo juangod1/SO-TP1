@@ -1,6 +1,7 @@
 //
 // Created by juangod on 24/03/18.
 //
+#include "testLib.h"
 #include "messaqueQueue.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +19,6 @@ void givenAString();
 void givenAChange();
 
 void whenPrintingToStandardOutput();
-
-void thenSuccess();
 
 void setString(char * stringValue);
 
@@ -62,8 +61,4 @@ void setString(char * stringValue){
 
 void whenPrintingToStandardOutput(){
   printf("%s\n",parameter);
-}
-
-void thenSuccess(){
-  printf("Ok!\n");
 }
