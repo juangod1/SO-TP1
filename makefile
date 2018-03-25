@@ -42,7 +42,7 @@ slave: $(SLAVE_OBJECTS)
 	$(CC) $(SLAVE_OBJECTS) -o Binaries/$(EXEC_SLAVE) $(LINKER_OPTIONS)
 
 view: $(VIEW_OBJECTS)
-	$(CC) $(SLAVE_OBJECTS) -o Binaries/$(EXEC_VIEW) $(LINKER_OPTIONS)
+	$(CC) $(VIEW_OBJECTS) -o Binaries/$(EXEC_VIEW) $(LINKER_OPTIONS)
 
 binaries_setup:
 	if [ -d "Binaries" ]; then echo "Binaries directory found, proceeding..."; else mkdir Binaries; fi
