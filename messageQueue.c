@@ -44,3 +44,9 @@ void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor){
 void closeMessageQueue(mqd_t queueDescriptor){
     mq_close(queueDescriptor);
 }
+
+long numberOfMessages(mqd_t queueID){
+    struct mq_attr attributes = {};
+    mq_getattr(queueID, &attributes);
+    return attributes.mq_curmsgs;
+}

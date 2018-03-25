@@ -12,5 +12,6 @@ mqd_t createQueue(const char* mqName, long messageSize, long maxMessages);
 void getMessage(mqd_t queueDescriptor, size_t messageSize, char * buffer);
 void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor);
 void closeMessageQueue(mqd_t queueDescriptor);
+long numberOfMessages(mqd_t queueID);
 
 #endif //SO_TP1_MESSAQUEQUEUE_H

@@ -9,30 +9,70 @@
 #include "messaqueQueue.h"
 #include <unistd.h>
 #include <math.h>
+#include <string.h>
 
 void run(int argc, const char ** argv){
+    int hashCount = 0;
+
     // Creates shared memory buffer for view process and message queues for slave processes
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
     int queueIDs[2]={0};
     createMasterQueues(argc,queueIDs);
-    printf("%d %d\n",queueIDs[0],queueIDs[1]);
+
+    // Queue files for slaves to poll
+    for(int i=1; i<argc; i++)
+        sendMessage(argv[i],PATH_MAX,FILEQ_ID);
+
     // Launch slave processes
-    createSlaves(slaveNumberCalculator(argc),argv);
+    createSlaves(slaveNumberCalculator(argc),queueIDs);
+
+    // Process cycle
+    while(hashCount != (argc-1)){
+        int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
+        int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
+        char hashBuffer[HASH_SIZE] = {0};
+
+        switch(semaphoreState){
+            case RED:
+                cleanBuffer(sharedBuffer,BUFFER_SIZE);
+                getMessage(HASHQ_ID,HASH_SIZE,hashBuffer);
+                memcpy(sharedBuffer+2,hashBuffer,HASH_SIZE);
+                // TODO: write hash to file on disc
+                *((char *)sharedBuffer+1) = GREEN;
+                break;
+            case GREEN:
+                if(visualIsConnected){
+                    while(*((char *)sharedBuffer+1));
+                }
+                else
+                    *((char *)sharedBuffer+1) = RED;
+                break;
+            default:
+                perror("Illegal semaphore state ERROR");
+                exit(-1);
+        }
+    }
 }
 
-void createSlaves(int numberOfSlaves, const char ** argv){
+void createSlaves(int numberOfSlaves, int queueIDs[2]){
     int pid;
+    char slaveArgs[2][PID_MAX_DIGITS]={};
+
+    sprintf(slaveArgs[0], "%d", FILEQ_ID);
+    sprintf(slaveArgs[1], "%d", HASHQ_ID);
+
     for(int i=0;i<numberOfSlaves;i++){
         if( (pid=fork()) == 0){ // Child process
-            if(execv("./Binaries/slave",(char * const *)argv) == -1)
-                perror("execve ERROR");
+            if(execv("./Binaries/slave", (char * const *)slaveArgs) == -1)
+                perror("execv ERROR");
 
             exit(-1);
         }
     }
 }
 
-// The first byte is the semaphore for the view process
+// The first byte of the buffer is a 1 if the view process is connected, 0 if it is not
+// The second byte is the semaphore for the view process
 // When RED the master process cleans the buffer, reads a hash, writes the hash to the file output and sets the semaphore GREEN
 // When GREEN the view process reads from the buffer, displays the information and sets the semaphore RED
 // GREEN evaluates to true, while RED evaluates to false
@@ -41,7 +81,8 @@ void * createBuffer(size_t size){
     int visibility = MAP_ANONYMOUS | MAP_SHARED;
     void * buffer = mmap(NULL, size, protection, visibility, 0, 0); // MAN PAGE: If addr is NULL, then the kernel chooses the address at which to create the mapping.
 
-    *((char*)buffer)= RED; // Initializes semaphore as RED (Control to master proces)
+    *((char*)buffer) = 0;
+    *((char*)buffer+1) = RED; // Initializes semaphore as RED (Control to master proces)
 
     return buffer;
 }
@@ -64,3 +105,7 @@ int slaveNumberCalculator(int argc){
     return (int)ceil((double)(argc-1)/PONDERATIVE_PROCESS_INDEX);
 }
 
+void cleanBuffer(void * buff, int buffSize){
+    for(int i=0; i<buffSize ; i++)
+        *((char*)buff+i)=0;
+}

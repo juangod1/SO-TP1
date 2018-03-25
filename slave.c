@@ -6,6 +6,5 @@
 #include <unistd.h>
 
 int main(){
-    int pid = getpid();
-    printf("HELLO I AM %d\n",pid);
+
 }
