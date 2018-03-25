@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "messaqueQueue.h"
+#include "messageQueue.h"
 #include "master.h"
 
 int main(int argc, const char ** argv){
@@ -8,6 +8,7 @@ int main(int argc, const char ** argv){
         perror("Error: 0 program arguments received.\nExiting program...\n");
         exit(-1);
     }
+    //TODO: RECEIVE OPTION TEST
 
     run(argc,argv);
 }

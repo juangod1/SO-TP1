@@ -6,7 +6,7 @@
 #include <sys/mman.h>
 #include <linux/limits.h>
 #include "master.h"
-#include "messaqueQueue.h"
+#include "messageQueue.h"
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
@@ -18,10 +18,14 @@ void run(int argc, const char ** argv){
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
     int queueIDs[2]={0};
     createMasterQueues(argc,queueIDs);
-
+    printf("ids: %d, %d\n",FILEQ_ID,HASHQ_ID);
+    fflush(stdout);
     // Queue files for slaves to poll
-    for(int i=1; i<argc; i++)
-        sendMessage(argv[i],PATH_MAX,FILEQ_ID);
+    for(int i=1; i<argc; i++) {
+        sendMessage(argv[i], strlen(argv[i]), FILEQ_ID);
+    }
+
+    // TODO:if is test argument launch test slave
 
     // Launch slave processes
     createSlaves(slaveNumberCalculator(argc),queueIDs);
@@ -35,7 +39,9 @@ void run(int argc, const char ** argv){
         switch(semaphoreState){
             case RED:
                 cleanBuffer(sharedBuffer,BUFFER_SIZE);
+                // TODO: if received message
                 getMessage(HASHQ_ID,HASH_SIZE,hashBuffer);
+                hashCount++;
                 memcpy(sharedBuffer+2,hashBuffer,HASH_SIZE);
                 // TODO: write hash to file on disc
                 *((char *)sharedBuffer+1) = GREEN;
@@ -52,18 +58,34 @@ void run(int argc, const char ** argv){
                 exit(-1);
         }
     }
+    printf("Done!\n");
+}
+
+void createTestSlave(){
+
 }
 
 void createSlaves(int numberOfSlaves, int queueIDs[2]){
     int pid;
-    char slaveArgs[2][PID_MAX_DIGITS]={};
+    char slaveFile[sizeof(FILEQ_ID)] = {};
+    char slaveHash[sizeof(HASHQ_ID)] = {};
+    char slaveTest[1] = {};
 
-    sprintf(slaveArgs[0], "%d", FILEQ_ID);
-    sprintf(slaveArgs[1], "%d", HASHQ_ID);
+    sprintf(slaveFile, "%d", FILEQ_ID);
+    sprintf(slaveHash, "%d", HASHQ_ID);
+    sprintf(slaveTest, "%d", IS_NOT_TEST_SLAVE);
+
+    char * parameters[5];
+
+    parameters[0] = "./Binaries/slave";
+    parameters[1] = slaveFile;
+    parameters[2] = slaveHash;
+    parameters[3] = slaveTest;
+    parameters[4] = (char *) NULL;
 
     for(int i=0;i<numberOfSlaves;i++){
         if( (pid=fork()) == 0){ // Child process
-            if(execv("./Binaries/slave", (char * const *)slaveArgs) == -1)
+            if(execv("./Binaries/slave", parameters) == -1)
                 perror("execv ERROR");
 
             exit(-1);
@@ -91,6 +113,12 @@ void * createBuffer(size_t size){
 // int[0] is fileQueue, int[1] is hashQueue
 int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
     mqd_t fileQueue, hashQueue;
+
+    fileQueue = createQueue("/fileQueue",PATH_MAX,numberOfFiles);
+    hashQueue = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
+
+    closeFileQueue();
+    closeHashQueue();
 
     fileQueue = createQueue("/fileQueue",PATH_MAX,numberOfFiles);
     hashQueue = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);

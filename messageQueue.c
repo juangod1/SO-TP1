@@ -1,7 +1,7 @@
 //
 // Created by juangod on 23/03/18.
 //
-#include "messaqueQueue.h"
+#include "messageQueue.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -41,8 +41,12 @@ void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor){
         perror("mq_send ERROR");
 }
 
-void closeMessageQueue(mqd_t queueDescriptor){
-    mq_close(queueDescriptor);
+void closeHashQueue(){
+    mq_unlink("/hashQueue");
+}
+
+void closeFileQueue(){
+    mq_unlink("/fileQueue");
 }
 
 int isEmpty(mqd_t queueID){
@@ -50,7 +54,7 @@ int isEmpty(mqd_t queueID){
 }
 
 long numberOfMessages(mqd_t queueID){
-    struct mq_attr attributes = {};
+    struct mq_attr attributes = {0};
     mq_getattr(queueID, &attributes);
     return attributes.mq_curmsgs;
 }

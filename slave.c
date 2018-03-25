@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include "testSlave.h"
-#include "messaqueQueue.h"
+#include "messageQueue.h"
 #include "slave.h"
 #include "testLib.h"
 
@@ -23,9 +23,9 @@ int main(int argc, const char ** argv)
   }
   mqd_t fileQueueDescriptor = (mqd_t) strtol(argv[1],NULL, BASE10);
   mqd_t hashQueueDescriptor = (mqd_t) strtol(argv[2],NULL, BASE10);
-  int isTest = strtol(argv[3],NULL,BASE10);
-
-  if(isTest)
+  long isTest = strtol(argv[3],NULL,BASE10);
+    printf("argv: %s, %s\n",argv[1],argv[2]);
+  if(isTest == IS_TEST_SLAVE)
   {
     testRun();
     exit(1);

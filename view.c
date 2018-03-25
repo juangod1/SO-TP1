@@ -2,7 +2,7 @@
 // Created by juangod on 24/03/18.
 //
 #include "testLib.h"
-#include "messaqueQueue.h"
+#include "messageQueue.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

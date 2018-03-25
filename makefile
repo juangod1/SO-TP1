@@ -4,7 +4,7 @@
 
 CC = gcc
 CC_FLAGS = -Wall
-LINKER_OPTIONS = -lrt -lm
+LINKER_OPTIONS = -lrt -lm -g
 
 SOURCES = $(wildcard *.c)
 SOURCES_AUX := $(SOURCES)
