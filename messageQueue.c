@@ -45,6 +45,10 @@ void closeMessageQueue(mqd_t queueDescriptor){
     mq_close(queueDescriptor);
 }
 
+int isEmpty(mqd_t queueID){
+  return !numberOfMessages(queueID);
+}
+
 long numberOfMessages(mqd_t queueID){
     struct mq_attr attributes = {};
     mq_getattr(queueID, &attributes);

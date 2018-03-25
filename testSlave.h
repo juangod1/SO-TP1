@@ -5,7 +5,7 @@ void givenExistingFile();
 void whenExecuting();
 void thenValueIsNotNull();
 void testExistingFilePrint();
-int testRun(int argc, const char ** argv);
+int testRun();
 
 
 #endif

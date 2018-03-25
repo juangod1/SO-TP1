@@ -9,9 +9,10 @@
 #include "slave.h"
 
 
-char * testPath;
+char testPath[MAX_PATH_LEN];
+char buffer[MD5_LEN];
 
-int testRun(int argc, const char ** argv)
+int testRun()
 {
     testExistingFilePrint();
     return 0;
@@ -19,17 +20,11 @@ int testRun(int argc, const char ** argv)
 
 void testExistingFilePrint(){
   printf("Testing Existing File Print...  \n");
-
-  testPath=malloc(30);
   givenExistingFile();
 
-  char* buffer= malloc(MD5_LEN);
   whenExecuting(buffer);
 
   thenValueIsNotNull(buffer);
-
-  free(testPath);
-  free(buffer);
 }
 
 void thenValueIsNotNull(char *buffer){

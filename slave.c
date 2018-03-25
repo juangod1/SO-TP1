@@ -8,19 +8,53 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include "testSlave.h"
+#include "messaqueQueue.h"
 #include "slave.h"
 #include "testLib.h"
 
+
 int main(int argc, const char ** argv)
 {
-    char * buffer = malloc(MD5_LEN);
-    readMD5("slave",buffer);
-    return 0;
+  if(argc!=4)
+  {
+    perror("Illegal argument exception.");
+    exit(-1);
+  }
+  mqd_t fileQueueDescriptor = (mqd_t) strtol(argv[1],NULL, BASE10);
+  mqd_t hashQueueDescriptor = (mqd_t) strtol(argv[2],NULL, BASE10);
+  int isTest = strtol(argv[3],NULL,BASE10);
+
+  if(isTest)
+  {
+    testRun();
+    exit(1);
+  }
+
+  char path[MAX_PATH_LEN];
+  char buffer[MD5_LEN];
+
+  while(!isEmpty(fileQueueDescriptor))
+  {
+    getMessage(fileQueueDescriptor, 256, path);
+    if(path==NULL)
+    {
+      printf("Null message\n");
+    }
+    else
+    {
+      readMD5(path,buffer);
+      sendMessage(buffer, 32, hashQueueDescriptor);
+    }
+  }
+  return 0;
 }
+
 
 int readMD5(const char* path, char* buffer)
 {
-  if(!is_regular_file(path)){
+  if(!is_regular_file(path))
+  {
     printf("ERROR: \"%s\" ",path);
     fflush(stdout);
     perror("IS NOT A REGULAR FILE");
