@@ -4,7 +4,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <linux/limits.h>
 #include "master.h"
+#include "messaqueQueue.h"
+#include <unistd.h>
+#include <math.h>
+
+void run(int argc, const char ** argv){
+    // Creates shared memory buffer for view process and message queues for slave processes
+    void * sharedBuffer = createBuffer(BUFFER_SIZE);
+    int queueIDs[2]={0};
+    createMasterQueues(argc,queueIDs);
+    printf("%d %d\n",queueIDs[0],queueIDs[1]);
+    // Launch slave processes
+    createSlaves(slaveNumberCalculator(argc),argv);
+}
+
+void createSlaves(int numberOfSlaves, const char ** argv){
+    int pid;
+    for(int i=0;i<numberOfSlaves;i++){
+        if( (pid=fork()) == 0){ // Child process
+            if(execv("./Binaries/slave",(char * const *)argv) == -1)
+                perror("execve ERROR");
+
+            exit(-1);
+        }
+    }
+}
 
 // The first byte is the semaphore for the view process
 // When RED the master process cleans the buffer, reads a hash, writes the hash to the file output and sets the semaphore GREEN
@@ -19,3 +45,22 @@ void * createBuffer(size_t size){
 
     return buffer;
 }
+
+// Returns queueDescriptorArray with mqd_t of both queues
+// int[0] is fileQueue, int[1] is hashQueue
+int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
+    mqd_t fileQueue, hashQueue;
+
+    fileQueue = createQueue("/fileQueue",PATH_MAX,numberOfFiles);
+    hashQueue = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
+
+    queueDescriptorArray[0] = fileQueue;
+    queueDescriptorArray[1] = hashQueue;
+
+    return queueDescriptorArray;
+}
+
+int slaveNumberCalculator(int argc){
+    return (int)ceil((double)(argc-1)/PONDERATIVE_PROCESS_INDEX);
+}
+
