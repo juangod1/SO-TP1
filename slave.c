@@ -24,7 +24,10 @@ int main(int argc, const char ** argv)
   mqd_t fileQueueDescriptor = (mqd_t) strtol(argv[1],NULL, BASE10);
   mqd_t hashQueueDescriptor = (mqd_t) strtol(argv[2],NULL, BASE10);
   long isTest = strtol(argv[3],NULL,BASE10);
-    printf("argv: %s, %s\n",argv[1],argv[2]);
+
+    printf("QID: %d, %d\n",fileQueueDescriptor,hashQueueDescriptor);
+    printf("messages %d\n",(int)numberOfMessages(fileQueueDescriptor));fflush(stdout);
+
   if(isTest == IS_TEST_SLAVE)
   {
     testRun();
@@ -33,7 +36,7 @@ int main(int argc, const char ** argv)
 
   char path[MAX_PATH_LEN];
   char buffer[MD5_LEN];
-
+    printf("messages %d",(int)numberOfMessages(fileQueueDescriptor));fflush(stdout);
   while(!isEmpty(fileQueueDescriptor))
   {
     getMessage(fileQueueDescriptor, 256, path);
@@ -44,6 +47,7 @@ int main(int argc, const char ** argv)
     else
     {
       readMD5(path,buffer);
+        printf("%s\n",buffer);fflush(stdout);
       sendMessage(buffer, 32, hashQueueDescriptor);
     }
   }

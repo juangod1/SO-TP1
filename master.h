@@ -13,7 +13,7 @@
 #define BUFFER_SIZE 32
 #define FILEQ_ID queueIDs[0]
 #define HASHQ_ID queueIDs[1]
-#define PID_MAX_DIGITS 5
+#define QID_MAX_DIGITS 5
 #define IS_TEST_SLAVE 2
 #define IS_NOT_TEST_SLAVE 1
 

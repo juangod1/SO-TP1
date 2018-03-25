@@ -18,13 +18,12 @@ void run(int argc, const char ** argv){
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
     int queueIDs[2]={0};
     createMasterQueues(argc,queueIDs);
-    printf("ids: %d, %d\n",FILEQ_ID,HASHQ_ID);
-    fflush(stdout);
+
     // Queue files for slaves to poll
     for(int i=1; i<argc; i++) {
         sendMessage(argv[i], strlen(argv[i]), FILEQ_ID);
     }
-
+    printf("messages %d\n",(int)numberOfMessages(FILEQ_ID));fflush(stdout);
     // TODO:if is test argument launch test slave
 
     // Launch slave processes
@@ -32,6 +31,7 @@ void run(int argc, const char ** argv){
 
     // Process cycle
     while(hashCount != (argc-1)){
+        printf("HASH COUNT: %d\n",hashCount);fflush(stdout);
         int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
         int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
         char hashBuffer[HASH_SIZE] = {0};
@@ -67,9 +67,9 @@ void createTestSlave(){
 
 void createSlaves(int numberOfSlaves, int queueIDs[2]){
     int pid;
-    char slaveFile[sizeof(FILEQ_ID)] = {};
-    char slaveHash[sizeof(HASHQ_ID)] = {};
-    char slaveTest[1] = {};
+    char slaveFile[2] = {};
+    char slaveHash[2] = {};
+    char slaveTest[2] = {};
 
     sprintf(slaveFile, "%d", FILEQ_ID);
     sprintf(slaveHash, "%d", HASHQ_ID);
