@@ -9,7 +9,7 @@ int main(int argc, const char ** argv){
         exit(-1);
     }
 
-    //TODO: RECEIVE OPTION TEST
+    //TODO: RECEIVE OPTION TEST and send a 1 or 0 to run, accordingly
 
     run(argc,argv,0);
 }

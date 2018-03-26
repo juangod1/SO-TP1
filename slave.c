@@ -62,7 +62,6 @@ int readMD5(const char* path, char* buffer)
     printf("ERROR: \"%s\" ",path);
     fflush(stdout);
     perror("IS NOT A REGULAR FILE");
-    exit(-1);
   }
   char cmd[sizeof(MD5_CMD_FMT)+ MAX_PATH_LEN];
   sprintf(cmd, MD5_CMD_FMT, path);

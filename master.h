@@ -17,6 +17,7 @@
 #define IS_TEST_SLAVE 2
 #define IS_NOT_TEST_SLAVE 1
 
+
 void * createBuffer(size_t size);
 int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray);
 int slaveNumberCalculator(int numberOfFiles);

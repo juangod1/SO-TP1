@@ -15,6 +15,7 @@ void run(int argc, const char ** argv, int testMode){
     int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
+
     // Creates shared memory buffer for view process and message queues for slave processes
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
     int queueIDs[2]={0};
@@ -26,7 +27,7 @@ void run(int argc, const char ** argv, int testMode){
         sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
     }
 
-    // TODO:if is test argument launch test slave
+    // TODO: if is test argument launch test slave
 
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
@@ -40,12 +41,13 @@ void run(int argc, const char ** argv, int testMode){
         switch(semaphoreState){
             case RED:
                 cleanBuffer(sharedBuffer,BUFFER_SIZE);
-
                 if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
                     hashCount++;
                 printf("Received message: %s\n",hashBuffer);
                 memcpy(sharedBuffer+2,hashBuffer,HASH_SIZE);
+
                 // TODO: write hash to file on disc
+
                 *((char *)sharedBuffer+1) = GREEN;
                 break;
             case GREEN:
@@ -63,13 +65,13 @@ void run(int argc, const char ** argv, int testMode){
 }
 
 void createTestSlave(){
-
+// TODO: this
 }
 
 void  createSlaves(int numberOfFiles, int testMode){
     int numberOfSlaves = slaveNumberCalculator(numberOfFiles);
     int pid;
-    char numberOfFilesArr[2] = {};
+    char numberOfFilesArr[ARG_MAX%10+1] = {};
     char testModeArr[2] = {};
 
     sprintf(numberOfFilesArr, "%d", numberOfFiles);

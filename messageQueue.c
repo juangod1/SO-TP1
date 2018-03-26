@@ -14,6 +14,11 @@
 #define QUEUE_OPTIONS 0666
 
 mqd_t createQueue(const char* mqName, long messageSize, long maxMessages) {
+    if(maxMessages>readSystemMaxMsg()){
+        printf("----------------------------------------\nUnable to complete operation: Your max_msg system variable (%d) is smaller than number of files sent (%ld).\n You can modify this value in /proc/sys/fs/mqueue/msg_max\n----------------------------------------\nExiting the program...\n",readSystemMaxMsg(),maxMessages);
+        exit(-1);
+    }
+
     mqd_t queueDescriptor;
     struct mq_attr queueAttributes;
     int flags = O_CREAT|O_RDWR;
@@ -25,6 +30,7 @@ mqd_t createQueue(const char* mqName, long messageSize, long maxMessages) {
     queueDescriptor = mq_open(mqName,flags,QUEUE_OPTIONS,&queueAttributes);
     if (queueDescriptor==-1){
         perror("mq_open() ERROR");
+        exit(1);
     }
 
     return queueDescriptor;
@@ -63,4 +69,11 @@ long numberOfMessages(mqd_t queueID){
         perror("mq_getattr ERROR");
     }
     return attributes.mq_curmsgs;
+}
+
+int readSystemMaxMsg(){
+    FILE *file = popen("cat /proc/sys/fs/mqueue/msg_max","r");
+    char buffer[7];
+    fgets(buffer,6,file);
+    return (int)strtol(buffer,NULL,BASE10);
 }
