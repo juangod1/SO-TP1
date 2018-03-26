@@ -19,9 +19,9 @@
 
 void * createBuffer(size_t size);
 int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray);
-void run(int argc, const char ** argv);
-int slaveNumberCalculator(int argc);
-void createSlaves(int numberOfSlaves, int queueIDs[2]);
+int slaveNumberCalculator(int numberOfFiles);
+void  createSlaves(int numberOfFiles, int testMode);
 void cleanBuffer(void * buff, int buffSize);
+void run(int argc, const char ** argv, int testMode);
 
 #endif //SO_TP1_MASTER_H

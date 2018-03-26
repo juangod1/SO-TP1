@@ -13,22 +13,22 @@
 #include "slave.h"
 #include "testLib.h"
 
-
+// Receives three arguments, program name, number of files and isTest
 int main(int argc, const char ** argv)
 {
-  if(argc!=4)
+  if(argc!=3)
   {
     perror("Illegal argument exception.");
     exit(-1);
   }
-  mqd_t fileQueueDescriptor = (mqd_t) strtol(argv[1],NULL, BASE10);
-  mqd_t hashQueueDescriptor = (mqd_t) strtol(argv[2],NULL, BASE10);
-  long isTest = strtol(argv[3],NULL,BASE10);
+  mqd_t fileQueueDescriptor, hashQueueDescriptor;
+  long numberOfFiles = strtol(argv[1],NULL,BASE10);
+  long isTest = strtol(argv[2],NULL,BASE10);
 
-    printf("QID: %d, %d\n",fileQueueDescriptor,hashQueueDescriptor);
-    printf("messages %d\n",(int)numberOfMessages(fileQueueDescriptor));fflush(stdout);
+    fileQueueDescriptor = createQueue("/fileQueue",MAX_PATH_LEN,numberOfFiles);
+    hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
 
-  if(isTest == IS_TEST_SLAVE)
+  if(isTest)
   {
     testRun();
     exit(1);
@@ -36,10 +36,11 @@ int main(int argc, const char ** argv)
 
   char path[MAX_PATH_LEN];
   char buffer[MD5_LEN];
-    printf("messages %d",(int)numberOfMessages(fileQueueDescriptor));fflush(stdout);
+
   while(!isEmpty(fileQueueDescriptor))
   {
-    getMessage(fileQueueDescriptor, 256, path);
+    getMessage(fileQueueDescriptor, MAX_PATH_LEN, path);
+      printf("path: %s\n",path);
     if(path==NULL)
     {
       printf("Null message\n");
@@ -47,11 +48,10 @@ int main(int argc, const char ** argv)
     else
     {
       readMD5(path,buffer);
-        printf("%s\n",buffer);fflush(stdout);
-      sendMessage(buffer, 32, hashQueueDescriptor);
+      sendMessage(buffer, HASH_SIZE, hashQueueDescriptor);
     }
   }
-  return 0;
+    exit(0);
 }
 
 

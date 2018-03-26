@@ -16,7 +16,7 @@
 mqd_t createQueue(const char* mqName, long messageSize, long maxMessages) {
     mqd_t queueDescriptor;
     struct mq_attr queueAttributes;
-    int flags = O_RDWR|O_CREAT;
+    int flags = O_CREAT|O_RDWR;
 
     queueAttributes.mq_flags = O_NONBLOCK;
     queueAttributes.mq_msgsize = messageSize;
@@ -30,10 +30,12 @@ mqd_t createQueue(const char* mqName, long messageSize, long maxMessages) {
     return queueDescriptor;
 }
 
-void getMessage(mqd_t queueDescriptor, size_t bufferSize, char * buffer){
-    if(mq_receive(queueDescriptor,buffer,bufferSize,0)==-1){
+ssize_t getMessage(mqd_t queueDescriptor, size_t bufferSize, char * buffer){
+    ssize_t ret;
+    if((ret = mq_receive(queueDescriptor,buffer,bufferSize,0))==-1){
         perror("mq_receive ERROR");
     }
+    return ret;
 }
 
 void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor){
@@ -42,11 +44,13 @@ void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor){
 }
 
 void closeHashQueue(){
-    mq_unlink("/hashQueue");
+    if(mq_unlink("/hashQueue")==-1)
+        perror("no /hashQueue previously left open... (mq_unlink) ");
 }
 
 void closeFileQueue(){
-    mq_unlink("/fileQueue");
+    if(mq_unlink("/fileQueue")==-1)
+        perror("no /fileQueue previously left open... (mq_unlink) ");
 }
 
 int isEmpty(mqd_t queueID){
@@ -54,7 +58,9 @@ int isEmpty(mqd_t queueID){
 }
 
 long numberOfMessages(mqd_t queueID){
-    struct mq_attr attributes = {0};
-    mq_getattr(queueID, &attributes);
+    struct mq_attr attributes;
+    if(mq_getattr(queueID, &attributes)==-1){
+        perror("mq_getattr ERROR");
+    }
     return attributes.mq_curmsgs;
 }

@@ -8,7 +8,8 @@ int main(int argc, const char ** argv){
         perror("Error: 0 program arguments received.\nExiting program...\n");
         exit(-1);
     }
+
     //TODO: RECEIVE OPTION TEST
 
-    run(argc,argv);
+    run(argc,argv,0);
 }

@@ -9,7 +9,7 @@
 #include <stddef.h>
 
 mqd_t createQueue(const char* mqName, long messageSize, long maxMessages);
-void getMessage(mqd_t queueDescriptor, size_t messageSize, char * buffer);
+ssize_t getMessage(mqd_t queueDescriptor, size_t bufferSize, char * buffer);
 void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor);
 void closeFileQueue();
 void closeHashQueue();

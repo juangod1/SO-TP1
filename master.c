@@ -11,27 +11,28 @@
 #include <math.h>
 #include <string.h>
 
-void run(int argc, const char ** argv){
+void run(int argc, const char ** argv, int testMode){
+    int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
-
+    int numberOfFiles = argc - parametersOffset;
     // Creates shared memory buffer for view process and message queues for slave processes
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
     int queueIDs[2]={0};
-    createMasterQueues(argc,queueIDs);
+    createMasterQueues(numberOfFiles,queueIDs);
 
     // Queue files for slaves to poll
-    for(int i=1; i<argc; i++) {
-        sendMessage(argv[i], strlen(argv[i]), FILEQ_ID);
+    for(int i=0; i<numberOfFiles; i++) {
+
+        sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
     }
-    printf("messages %d\n",(int)numberOfMessages(FILEQ_ID));fflush(stdout);
+
     // TODO:if is test argument launch test slave
 
     // Launch slave processes
-    createSlaves(slaveNumberCalculator(argc),queueIDs);
+    createSlaves(numberOfFiles,testMode);
 
     // Process cycle
-    while(hashCount != (argc-1)){
-        printf("HASH COUNT: %d\n",hashCount);fflush(stdout);
+    while(hashCount != (numberOfFiles)){
         int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
         int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
         char hashBuffer[HASH_SIZE] = {0};
@@ -39,9 +40,10 @@ void run(int argc, const char ** argv){
         switch(semaphoreState){
             case RED:
                 cleanBuffer(sharedBuffer,BUFFER_SIZE);
-                // TODO: if received message
-                getMessage(HASHQ_ID,HASH_SIZE,hashBuffer);
-                hashCount++;
+
+                if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
+                    hashCount++;
+                printf("Received message: %s\n",hashBuffer);
                 memcpy(sharedBuffer+2,hashBuffer,HASH_SIZE);
                 // TODO: write hash to file on disc
                 *((char *)sharedBuffer+1) = GREEN;
@@ -58,30 +60,27 @@ void run(int argc, const char ** argv){
                 exit(-1);
         }
     }
-    printf("Done!\n");
 }
 
 void createTestSlave(){
 
 }
 
-void createSlaves(int numberOfSlaves, int queueIDs[2]){
+void  createSlaves(int numberOfFiles, int testMode){
+    int numberOfSlaves = slaveNumberCalculator(numberOfFiles);
     int pid;
-    char slaveFile[2] = {};
-    char slaveHash[2] = {};
-    char slaveTest[2] = {};
+    char numberOfFilesArr[2] = {};
+    char testModeArr[2] = {};
 
-    sprintf(slaveFile, "%d", FILEQ_ID);
-    sprintf(slaveHash, "%d", HASHQ_ID);
-    sprintf(slaveTest, "%d", IS_NOT_TEST_SLAVE);
+    sprintf(numberOfFilesArr, "%d", numberOfFiles);
+    sprintf(testModeArr, "%d", testMode);
 
-    char * parameters[5];
+    char * parameters[4];
 
     parameters[0] = "./Binaries/slave";
-    parameters[1] = slaveFile;
-    parameters[2] = slaveHash;
-    parameters[3] = slaveTest;
-    parameters[4] = (char *) NULL;
+    parameters[1] = numberOfFilesArr;
+    parameters[2] = testModeArr;
+    parameters[3] = (char *) NULL;
 
     for(int i=0;i<numberOfSlaves;i++){
         if( (pid=fork()) == 0){ // Child process
@@ -114,9 +113,6 @@ void * createBuffer(size_t size){
 int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
     mqd_t fileQueue, hashQueue;
 
-    fileQueue = createQueue("/fileQueue",PATH_MAX,numberOfFiles);
-    hashQueue = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
-
     closeFileQueue();
     closeHashQueue();
 
@@ -129,8 +125,8 @@ int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
     return queueDescriptorArray;
 }
 
-int slaveNumberCalculator(int argc){
-    return (int)ceil((double)(argc-1)/PONDERATIVE_PROCESS_INDEX);
+int slaveNumberCalculator(int numberOfFiles){
+    return (int)ceil((double)(numberOfFiles)/PONDERATIVE_PROCESS_INDEX);
 }
 
 void cleanBuffer(void * buff, int buffSize){
