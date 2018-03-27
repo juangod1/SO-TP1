@@ -8,10 +8,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+
 #include "testSlave.h"
 #include "messageQueue.h"
 #include "slave.h"
 #include "testLib.h"
+#include "fileTypes.h"
 
 // Receives three arguments, program name, number of files and isTest
 int main(int argc, const char ** argv)
@@ -85,11 +87,4 @@ int readMD5(const char* path, char* buffer)
   *buffer='\0';
   pclose(p);
   return 0;
-}
-
-int is_regular_file(const char *path)
-{
-    struct stat path_stat;
-    stat(path, &path_stat);
-    return S_ISREG(path_stat.st_mode);
 }

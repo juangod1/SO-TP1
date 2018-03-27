@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <linux/limits.h>
+
+#include "fileTypes.h"
 #include "master.h"
 #include "messageQueue.h"
 #include <unistd.h>
@@ -25,8 +27,14 @@ void run(int argc, const char ** argv, int testMode){
 
     // Queue files for slaves to poll
     for(int i=0; i<numberOfFiles; i++) {
-
-        sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
+        if(is_regular_file(argv[i+parametersOffset]))
+        {
+            sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
+        }
+        else
+        {
+            
+        }
     }
 
     // TODO: if is test argument launch test slave
