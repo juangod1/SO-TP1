@@ -15,6 +15,8 @@ void run(int argc, const char ** argv, int testMode){
     int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
+    FILE *fileToWrite;
+    fileToWrite =  fopen("hashDump.txt","a");
 
     // Creates shared memory buffer for view process and message queues for slave processes
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
@@ -31,12 +33,11 @@ void run(int argc, const char ** argv, int testMode){
 
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
-
     // Process cycle
     while(hashCount != (numberOfFiles)){
         int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
         int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
-        char hashBuffer[HASH_SIZE] = {0};
+        char hashBuffer[HASH_SIZE+1] = {0};
 
         switch(semaphoreState){
             case RED:
@@ -45,7 +46,8 @@ void run(int argc, const char ** argv, int testMode){
                     hashCount++;
                 printf("Received message: %s\n",hashBuffer);
                 memcpy(sharedBuffer+2,hashBuffer,HASH_SIZE);
-
+                //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
+                fprintf(fileToWrite,"file hash: %s \n",hashBuffer);
                 // TODO: write hash to file on disc
 
                 *((char *)sharedBuffer+1) = GREEN;
@@ -62,6 +64,7 @@ void run(int argc, const char ** argv, int testMode){
                 exit(-1);
         }
     }
+    fclose(fileToWrite);
 }
 
 void createTestSlave(){

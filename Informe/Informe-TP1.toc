@@ -1,0 +1,7 @@
+\select@language {spanish}
+\contentsline {chapter}{\numberline {1}T\IeC {\'\i }tulo}{2}
+\contentsline {section}{\numberline {1.1}Subsection}{2}
+\contentsline {chapter}{\numberline {2}T\IeC {\'\i }tulo}{3}
+\contentsline {section}{\numberline {2.1}Subsection}{3}
+\contentsline {chapter}{\numberline {3}T\IeC {\'\i }tulo}{4}
+\contentsline {section}{\numberline {3.1}Subsection}{4}
