@@ -19,7 +19,7 @@
 \author{Juan Godfrid - 56609 \\Pablo Radnic - 57013 \\ Joaquín Ormachea - \\Francisco Delgado -}
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{ \textit{Intituto Tecnológico de Buenos Aires - 2018}}
+\lhead{ Instituto Tecnológico de Buenos Aires - 2018}
 
 \fancyfoot[C]{\thepage}
 
@@ -28,7 +28,7 @@
 	\fancyfoot[C]{\thepage}
 	\renewcommand{\headrulewidth}{0.4pt}
 	\renewcommand{\footrulewidth}{0.4pt}
-	\lhead{ \textit{Intituto Tecnológico de Buenos Aires - 2018}}
+	\lhead{ Instituto Tecnológico de Buenos Aires - 2018}
 }
 
 \begin{document}
@@ -51,7 +51,8 @@ Dummy text
 \section{Diseño del Sistema}
 asdf
 \section{IPCs}
-Dummy text
+\subsection{Message Queue}
+	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento LIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -70,7 +71,7 @@ Dummy text
 \section{Limitaciones del Sistema}
 asdfasldjfasd
 
-\section{Limitaciones del Código}
+\section{Limitaciones de la Implementación}
 asdfasdf
 Dummy text
 
