@@ -37,7 +37,7 @@ void run(int argc, const char ** argv, int testMode){
     while(hashCount != (numberOfFiles)){
         int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
         int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
-        char hashBuffer[HASH_SIZE] = {0};
+        char hashBuffer[HASH_SIZE+1] = {0};
 
         switch(semaphoreState){
             case RED:
