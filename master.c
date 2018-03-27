@@ -3,6 +3,7 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <sys/mman.h>
 #include <linux/limits.h>
 #include "master.h"
@@ -11,14 +12,15 @@
 #include <math.h>
 #include <string.h>
 
+int queueIDs[2]={0};
+
 void run(int argc, const char ** argv, int testMode){
     int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
 
     // Creates shared memory buffer for view process and message queues for slave processes
-    void * sharedBuffer = createBuffer(BUFFER_SIZE);
-    int queueIDs[2]={0};
+    
     createMasterQueues(numberOfFiles,queueIDs);
 
     // Queue files for slaves to poll
@@ -37,7 +39,7 @@ void run(int argc, const char ** argv, int testMode){
         int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
         int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
         char hashBuffer[HASH_SIZE] = {0};
-
+        //estamos leyendo el semaforo cada vez o solamente mirando la misma variable que copiamos?
         switch(semaphoreState){
             case RED:
                 cleanBuffer(sharedBuffer,BUFFER_SIZE);
@@ -73,6 +75,15 @@ void  createSlaves(int numberOfFiles, int testMode){
     int pid;
     char numberOfFilesArr[ARG_MAX%10+1] = {};
     char testModeArr[2] = {};
+
+    struct sigaction sigact;
+    sigact.sa_flags = 0;
+    sigemptyset(&sigact.sa_mask);
+    sigact.sa_handler = sigint;
+    if (sigaction(SIGINT, &sigact, NULL) < 0) {
+        perror("sigaction()");
+        exit(1);
+    }
 
     sprintf(numberOfFilesArr, "%d", numberOfFiles);
     sprintf(testModeArr, "%d", testMode);
@@ -131,7 +142,31 @@ int slaveNumberCalculator(int numberOfFiles){
     return (int)ceil((double)(numberOfFiles)/PONDERATIVE_PROCESS_INDEX);
 }
 
-void cleanBuffer(void * buff, int buffSize){
+void cleanBuffer(void * buff, int buffSize)
+{
     for(int i=0; i<buffSize ; i++)
         *((char*)buff+i)=0;
+}
+
+void sigint(int signo)
+{
+    void * sharedBuffer = createBuffer(BUFFER_SIZE);
+    int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
+    int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
+    char hashBuffer[HASH_SIZE] = {0};
+
+    while(semaphoreState == GREEN){
+        //wait for red
+    }
+    cleanBuffer(sharedBuffer,BUFFER_SIZE);
+    if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
+        hashCount++;
+    printf("Received message: %s\n",hashBuffer);
+    memcpy(sharedBuffer+2,hashBuffer,HASH_SIZE);
+
+    // TODO: write hash to file on disc
+
+    *((char *)sharedBuffer+1) = GREEN;
+    
+
 }
