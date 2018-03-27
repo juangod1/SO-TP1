@@ -21,7 +21,15 @@
 \fancyhf{}
 \lhead{ \textit{Intituto Tecnológico de Buenos Aires - 2018}}
 
-\fancyfoot[R]{Página \thepage}
+\fancyfoot[C]{\thepage}
+
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\fancyfoot[C]{\thepage}
+	\renewcommand{\headrulewidth}{0.4pt}
+	\renewcommand{\footrulewidth}{0.4pt}
+	\lhead{ \textit{Intituto Tecnológico de Buenos Aires - 2018}}
+}
 
 \begin{document}
 \maketitle
@@ -30,16 +38,22 @@
 \tableofcontents
 \newpage
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Utilización}
 
 Dummy text
-
-
 Dummy text
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Diseño}
-
+\section{Diseño del Sistema}
+asdf
+\section{IPCs}
 Dummy text
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Problemas y Resoluciones}
 \section{Proceso Maestro}
@@ -50,6 +64,8 @@ sdfasdf
 asdfadsf
 Dummy text
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Limitaciones}
 \section{Limitaciones del Sistema}
 asdfasldjfasd
@@ -58,7 +74,10 @@ asdfasldjfasd
 asdfasdf
 Dummy text
 
-\chapter{Citas}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Bibliografía}
+\section{Extractos de código}
 
 Dummy text
 
