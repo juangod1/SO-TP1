@@ -26,8 +26,8 @@ int main(int argc, const char ** argv)
   long numberOfFiles = strtol(argv[1],NULL,BASE10);
   long isTest = strtol(argv[2],NULL,BASE10);
 
-  fileQueueDescriptor = createQueue("/fileQueue",MAX_PATH_LEN,numberOfFiles);
-  hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
+  fileQueueDescriptor = createQueue("/fileQueue",MAX_PATH_LEN,numberOfFiles,O_NONBLOCK);
+  hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE,numberOfFiles,0);
 
   if(isTest)
   {
