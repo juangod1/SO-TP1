@@ -41,6 +41,12 @@ int main(int argc, const char ** argv)
 
   while(!isEmpty(fileQueueDescriptor))
   {
+    //cleaning buffer.
+    for(int i=0; i<MAX_PATH_LEN ; i++)
+    {
+        path[i]=0;
+    }
+
     getMessage(fileQueueDescriptor, MAX_PATH_LEN, path);
       printf("path: %s\n",path);
     if(path==NULL)
