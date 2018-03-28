@@ -94,7 +94,7 @@ void run(int argc, const char ** argv, int testMode){
                 break;
             case GREEN:
                 if(visualIsConnected){
-                    while(*((char *)sharedBuffer+1));
+                    while(*((char *)sharedBuffer+1));// TODO: espera no activa
                 }
                 else
                     *((char *)sharedBuffer+1) = RED;
@@ -105,8 +105,6 @@ void run(int argc, const char ** argv, int testMode){
         }
     }
     fclose(fileToWrite);
-    while(1);
-
 }
 
 void  createSlaves(int numberOfFiles, int testMode){

@@ -31,7 +31,7 @@ int main(int argc, const char ** argv)
 
   if(isTest)
   {
-    testRun(fileQueueDescriptor, hashQueueDescriptor);
+    testRun();
     fflush(stdout);
     exit(1);
   }
@@ -65,12 +65,12 @@ int main(int argc, const char ** argv)
 
 int readMD5(const char* path, char* buffer)
 {
+    pid_t pid = getppid();
   if(!is_regular_file(path))
   {
     printf("ERROR: \"%s\" ",path);
     fflush(stdout);
     perror("IS NOT A REGULAR FILE");
-    pid_t pid = getppid();
     kill(pid,SIGINT);
     exit(-1);
   }
@@ -81,6 +81,7 @@ int readMD5(const char* path, char* buffer)
   {
     perror("UNRESOLVABLE POPEN ERROR : CODE FF517FDA1");
     pclose(p);
+      kill(pid,SIGINT);
     exit(-1);
   }
   int i; char ch;
@@ -90,7 +91,9 @@ int readMD5(const char* path, char* buffer)
     if(!isxdigit(ch))
     {
       perror("UNRESOLVABLE MD5SUM ERROR : CODE FF517FDA1");
-      pclose(p);
+        kill(pid,SIGINT);
+        pclose(p);
+
       exit(-1);
     }
     *(buffer++) = ch;
