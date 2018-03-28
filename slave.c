@@ -31,7 +31,8 @@ int main(int argc, const char ** argv)
 
   if(isTest)
   {
-    testRun();
+    testRun(fileQueueDescriptor, hashQueueDescriptor);
+    fflush(stdout);
     exit(1);
   }
 

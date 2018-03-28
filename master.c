@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
+#include "masterTest.h"
 
 void sigint(int);
 
@@ -24,6 +25,20 @@ void createBufferAlternate(key_t key);
 void testBufferAlternate();
 
 void run(int argc, const char ** argv, int testMode){
+
+    int queueIDs[2]={0};
+
+    if(testMode){
+      int * status;
+      createTestQueue(queueIDs);
+      createTestSlave();
+      wait(status);
+      fflush(stdout);
+      closeFileQueue();
+      closeHashQueue();
+      exit(1);
+    }
+
     int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
@@ -32,7 +47,6 @@ void run(int argc, const char ** argv, int testMode){
 
     // Creates shared memory buffer for view process and message queues for slave processes
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
-    int queueIDs[2]={0};
     createMasterQueues(numberOfFiles,queueIDs);
 
     //Testing alternateBuffer
@@ -53,9 +67,6 @@ void run(int argc, const char ** argv, int testMode){
         perror("sigaction()");
         exit(-1);
     }
-
-    // TODO: if is test argument launch test slave
-
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
     // Process cycle
@@ -95,11 +106,7 @@ void run(int argc, const char ** argv, int testMode){
     }
     fclose(fileToWrite);
     while(1);
-    
-}
 
-void createTestSlave(){
-// TODO: this
 }
 
 void  createSlaves(int numberOfFiles, int testMode){
@@ -163,7 +170,7 @@ void createBufferAlternate(key_t key){
 
   printf("%p\n", bufferAddress);
 
-    //*(bufferAddress) = 0; 
+    //*(bufferAddress) = 0;
     //*(bufferAddress+1) = RED; // Initializes semaphore as RED (Control to master proces)
 }
 
