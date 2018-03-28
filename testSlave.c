@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -7,15 +8,41 @@
 #include "testSlave.h"
 #include "testLib.h"
 #include "slave.h"
-
+#include "messageQueue.h"
 
 char testPath[MAX_PATH_LEN];
 char buffer[MD5_LEN];
+char testBuffer[5];
 
-int testRun()
+int testRun(mqd_t fileQueueDescriptor, mqd_t hashQueueDescriptor)
 {
     testExistingFilePrint();
+    testGettingItemFromFileQueue(fileQueueDescriptor);
     return 0;
+}
+
+void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor){
+  givenAnExistingTestMessage();
+  whenReadingQueueDescriptor();
+  thenFoundMessage();
+}
+
+void   givenAnExistingTestMessage(){
+
+}
+
+void whenReadingQueueDescriptor(mqd_t fileQueueDescriptor){
+    getMessage(fileQueueDescriptor, 5, testBuffer);
+}
+
+void thenFoundMessage(){
+  if(strcmp(testBuffer,"test")==0){
+    Ok();
+  }
+  else{
+    printf("Expected: \"test\" found %s: \n", testBuffer);
+    Fail();
+  }
 }
 
 void testExistingFilePrint(){
@@ -29,7 +56,7 @@ void testExistingFilePrint(){
 
 void thenValueIsNotNull(char *buffer){
   if(buffer!=NULL){
-    printf("%s",buffer);
+    printf("%s\n",buffer);
     Ok();
     return;
   }
@@ -38,7 +65,7 @@ void thenValueIsNotNull(char *buffer){
 
 void givenExistingFile()
 {
-  sprintf(testPath, "slave");
+  sprintf(testPath, "messageQueue.c");
 }
 
 void whenExecuting(char * buffer)

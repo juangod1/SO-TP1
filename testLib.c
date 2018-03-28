@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 void Ok(){
-  printf("  Ok!\n");
+  printf("      Ok!\n");
 }
 
 void thenSuccess(){
@@ -10,5 +10,5 @@ void thenSuccess(){
 }
 
 void Fail(){
-  printf("  Failed\n");
+  printf("      Failed\n");
 }

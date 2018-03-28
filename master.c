@@ -4,14 +4,41 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <signal.h>
 #include <linux/limits.h>
 #include "master.h"
 #include "messageQueue.h"
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
+#include "masterTest.h"
+
+void sigint(int);
+
+//Var for shared memory space. Cuando todo este funcionando, se pone su .h correspondiente
+#include <sys/types.h>
+#include <sys/shm.h>
+#include <sys/ipc.h>
+int connectionId;
+char * bufferAddress;
+void createBufferAlternate(key_t key);
+void testBufferAlternate();
 
 void run(int argc, const char ** argv, int testMode){
+
+    int queueIDs[2]={0};
+
+    if(testMode){
+      int * status;
+      createTestQueue(queueIDs);
+      createTestSlave();
+      wait(status);
+      fflush(stdout);
+      closeFileQueue();
+      closeHashQueue();
+      exit(1);
+    }
+
     int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
@@ -20,8 +47,10 @@ void run(int argc, const char ** argv, int testMode){
 
     // Creates shared memory buffer for view process and message queues for slave processes
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
-    int queueIDs[2]={0};
     createMasterQueues(numberOfFiles,queueIDs);
+
+    //Testing alternateBuffer
+    testBufferAlternate();
 
     // Queue files for slaves to poll
     for(int i=0; i<numberOfFiles; i++) {
@@ -29,8 +58,15 @@ void run(int argc, const char ** argv, int testMode){
         sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
     }
 
-    // TODO: if is test argument launch test slave
-
+    // Set the signal listener
+    struct sigaction sigact;
+    sigact.sa_flags = 0;
+    sigemptyset(&sigact.sa_mask);
+    sigact.sa_handler = sigint;
+    if (sigaction(SIGHUP, &sigact, NULL) < 0) {
+        perror("sigaction()");
+        exit(-1);
+    }
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
     // Process cycle
@@ -42,6 +78,10 @@ void run(int argc, const char ** argv, int testMode){
         switch(semaphoreState){
             case RED:
                 cleanBuffer(sharedBuffer,BUFFER_SIZE);
+                if(isEmpty(HASHQ_ID)){
+                  //printf("Queue is empty.... waiting\n");
+                  break;
+                }
                 if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
                     hashCount++;
                 printf("Received message: %s\n",hashBuffer);
@@ -65,10 +105,8 @@ void run(int argc, const char ** argv, int testMode){
         }
     }
     fclose(fileToWrite);
-}
+    while(1);
 
-void createTestSlave(){
-// TODO: this
 }
 
 void  createSlaves(int numberOfFiles, int testMode){
@@ -113,6 +151,38 @@ void * createBuffer(size_t size){
     return buffer;
 }
 
+
+//El key que recibe tiene que ser el PID del proceso actual.
+void createBufferAlternate(key_t key){
+
+    //Attempting to create the shared memory
+  if((connectionId = shmget(key, BUFFER_SIZE, IPC_CREAT |0666)) < 0){
+    perror("Failed to create shared memory.\n");
+    exit(1);
+  }
+  printf("%d\n", connectionId);
+
+  //Attempting to create a connection with data space
+  if((bufferAddress = (char*)shmat(connectionId, 0, 0)) == (char*) -1){
+    perror("Failed to connect with data space.\n");
+    exit(1);
+  }
+
+  printf("%p\n", bufferAddress);
+
+    //*(bufferAddress) = 0;
+    //*(bufferAddress+1) = RED; // Initializes semaphore as RED (Control to master proces)
+}
+
+//Test para bufferAlternate
+void testBufferAlternate(){
+    key_t key = 1234;
+    createBufferAlternate(key);
+    *bufferAddress = 'r';
+    printf("%p\n", bufferAddress);
+    printf("Este es el dato que guardo en el buffer --> %c\n", *bufferAddress);
+}
+
 // Returns queueDescriptorArray with mqd_t of both queues
 // int[0] is fileQueue, int[1] is hashQueue
 int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
@@ -137,4 +207,12 @@ int slaveNumberCalculator(int numberOfFiles){
 void cleanBuffer(void * buff, int buffSize){
     for(int i=0; i<buffSize ; i++)
         *((char*)buff+i)=0;
+}
+
+void sigint(int signo)
+{
+    fflush(stdout);
+    printf("Error, exiting\n");
+    fflush(stdout);
+    //exit(-1);
 }
