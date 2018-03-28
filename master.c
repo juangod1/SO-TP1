@@ -14,6 +14,15 @@
 
 void sigint(int);
 
+//Var for shared memory space. Cuando todo este funcionando, se pone su .h correspondiente
+#include <sys/types.h>
+#include <sys/shm.h>
+#include <sys/ipc.h>
+int connectionId;
+char * bufferAddress;
+void createBufferAlternate(key_t key);
+void testBufferAlternate();
+
 void run(int argc, const char ** argv, int testMode){
     int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
@@ -25,6 +34,10 @@ void run(int argc, const char ** argv, int testMode){
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
     int queueIDs[2]={0};
     createMasterQueues(numberOfFiles,queueIDs);
+
+    //Testing alternateBuffer
+    testBufferAlternate();
+
     // Queue files for slaves to poll
     for(int i=0; i<numberOfFiles; i++) {
 
@@ -81,6 +94,8 @@ void run(int argc, const char ** argv, int testMode){
         }
     }
     fclose(fileToWrite);
+    while(1);
+    
 }
 
 void createTestSlave(){
@@ -127,6 +142,38 @@ void * createBuffer(size_t size){
     *((char*)buffer+1) = RED; // Initializes semaphore as RED (Control to master proces)
 
     return buffer;
+}
+
+
+//El key que recibe tiene que ser el PID del proceso actual.
+void createBufferAlternate(key_t key){
+
+    //Attempting to create the shared memory
+  if((connectionId = shmget(key, BUFFER_SIZE, IPC_CREAT |0666)) < 0){
+    perror("Failed to create shared memory.\n");
+    exit(1);
+  }
+  printf("%d\n", connectionId);
+
+  //Attempting to create a connection with data space
+  if((bufferAddress = (char*)shmat(connectionId, 0, 0)) == (char*) -1){
+    perror("Failed to connect with data space.\n");
+    exit(1);
+  }
+
+  printf("%p\n", bufferAddress);
+
+    //*(bufferAddress) = 0; 
+    //*(bufferAddress+1) = RED; // Initializes semaphore as RED (Control to master proces)
+}
+
+//Test para bufferAlternate
+void testBufferAlternate(){
+    key_t key = 1234;
+    createBufferAlternate(key);
+    *bufferAddress = 'r';
+    printf("%p\n", bufferAddress);
+    printf("Este es el dato que guardo en el buffer --> %c\n", *bufferAddress);
 }
 
 // Returns queueDescriptorArray with mqd_t of both queues
