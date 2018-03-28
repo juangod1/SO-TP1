@@ -1,7 +1,10 @@
-#Binaries
+# Hash Dump
+hashDump.txt
+
+# Binaries
 Binaries/*
 
-#CLion
+# CLion
 cmake-build-debug/*
 .idea/*
 CMakeLists.txt
