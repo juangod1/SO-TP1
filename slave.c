@@ -71,7 +71,7 @@ int readMD5(const char* path, char* buffer)
     printf("ERROR: \"%s\" ",path);
     fflush(stdout);
     perror("IS NOT A REGULAR FILE");
-    kill(pid,SIGINT);
+      kill(pid,SIGINT);
     exit(-1);
   }
   char cmd[sizeof(MD5_CMD_FMT)+ MAX_PATH_LEN];
@@ -81,7 +81,6 @@ int readMD5(const char* path, char* buffer)
   {
     perror("UNRESOLVABLE POPEN ERROR : CODE FF517FDA1");
     pclose(p);
-      kill(pid,SIGINT);
     exit(-1);
   }
   int i; char ch;
@@ -91,7 +90,6 @@ int readMD5(const char* path, char* buffer)
     if(!isxdigit(ch))
     {
       perror("UNRESOLVABLE MD5SUM ERROR : CODE FF517FDA1");
-        kill(pid,SIGINT);
         pclose(p);
 
       exit(-1);
