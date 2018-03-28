@@ -4,12 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <signal.h>
 #include <linux/limits.h>
 #include "master.h"
 #include "messageQueue.h"
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
+
+void sigint(int);
 
 void run(int argc, const char ** argv, int testMode){
     int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
@@ -22,11 +25,20 @@ void run(int argc, const char ** argv, int testMode){
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
     int queueIDs[2]={0};
     createMasterQueues(numberOfFiles,queueIDs);
-
     // Queue files for slaves to poll
     for(int i=0; i<numberOfFiles; i++) {
 
         sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
+    }
+
+    // Set the signal listener
+    struct sigaction sigact;
+    sigact.sa_flags = 0;
+    sigemptyset(&sigact.sa_mask);
+    sigact.sa_handler = sigint;
+    if (sigaction(SIGHUP, &sigact, NULL) < 0) {
+        perror("sigaction()");
+        exit(-1);
     }
 
     // TODO: if is test argument launch test slave
@@ -42,6 +54,10 @@ void run(int argc, const char ** argv, int testMode){
         switch(semaphoreState){
             case RED:
                 cleanBuffer(sharedBuffer,BUFFER_SIZE);
+                if(isEmpty(HASHQ_ID)){
+                  //printf("Queue is empty.... waiting\n");
+                  break;
+                }
                 if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
                     hashCount++;
                 printf("Received message: %s\n",hashBuffer);
@@ -137,4 +153,12 @@ int slaveNumberCalculator(int numberOfFiles){
 void cleanBuffer(void * buff, int buffSize){
     for(int i=0; i<buffSize ; i++)
         *((char*)buff+i)=0;
+}
+
+void sigint(int signo)
+{
+    fflush(stdout);
+    printf("Error, exiting\n");
+    fflush(stdout);
+    //exit(-1);
 }

@@ -4,6 +4,7 @@
 //https://stackoverflow.com/questions/4553012/checking-if-a-file-is-a-directory-or-just-a-file
 #include <stdio.h>
 #include <unistd.h>
+#include <signal.h>
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -25,8 +26,8 @@ int main(int argc, const char ** argv)
   long numberOfFiles = strtol(argv[1],NULL,BASE10);
   long isTest = strtol(argv[2],NULL,BASE10);
 
-    fileQueueDescriptor = createQueue("/fileQueue",MAX_PATH_LEN,numberOfFiles);
-    hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
+  fileQueueDescriptor = createQueue("/fileQueue",MAX_PATH_LEN,numberOfFiles);
+  hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
 
   if(isTest)
   {
@@ -62,6 +63,9 @@ int readMD5(const char* path, char* buffer)
     printf("ERROR: \"%s\" ",path);
     fflush(stdout);
     perror("IS NOT A REGULAR FILE");
+    pid_t pid = getppid();
+    kill(pid,SIGINT);
+    exit(-1);
   }
   char cmd[sizeof(MD5_CMD_FMT)+ MAX_PATH_LEN];
   sprintf(cmd, MD5_CMD_FMT, path);
@@ -69,6 +73,7 @@ int readMD5(const char* path, char* buffer)
   if(p==NULL)
   {
     perror("UNRESOLVABLE POPEN ERROR : CODE FF517FDA1");
+    pclose(p);
     exit(-1);
   }
   int i; char ch;
@@ -78,6 +83,7 @@ int readMD5(const char* path, char* buffer)
     if(!isxdigit(ch))
     {
       perror("UNRESOLVABLE MD5SUM ERROR : CODE FF517FDA1");
+      pclose(p);
       exit(-1);
     }
     *(buffer++) = ch;
