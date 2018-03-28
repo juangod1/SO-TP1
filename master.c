@@ -63,7 +63,7 @@ void run(int argc, const char ** argv, int testMode){
     sigact.sa_flags = 0;
     sigemptyset(&sigact.sa_mask);
     sigact.sa_handler = sigint;
-    if (sigaction(SIGHUP, &sigact, NULL) < 0) {
+    if (sigaction(SIGINT, &sigact, NULL) < 0) {
         perror("sigaction()");
         exit(-1);
     }
@@ -212,5 +212,5 @@ void sigint(int signo)
     fflush(stdout);
     printf("Error, exiting\n");
     fflush(stdout);
-    //exit(-1);
+    exit(-1);
 }
