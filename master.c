@@ -189,8 +189,8 @@ int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
     closeFileQueue();
     closeHashQueue();
 
-    fileQueue = createQueue("/fileQueue",PATH_MAX,numberOfFiles);
-    hashQueue = createQueue("/hashQueue",HASH_SIZE,numberOfFiles);
+    fileQueue = createQueue("/fileQueue",PATH_MAX,numberOfFiles,O_NONBLOCK);
+    hashQueue = createQueue("/hashQueue",HASH_SIZE,numberOfFiles,0);
 
     queueDescriptorArray[0] = fileQueue;
     queueDescriptorArray[1] = hashQueue;
