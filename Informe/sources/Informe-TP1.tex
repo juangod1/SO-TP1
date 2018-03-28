@@ -7,6 +7,7 @@
 \usepackage{fancyhdr}
 \usepackage{color}
 \usepackage{graphicx}
+\usepackage{listings}
 \graphicspath{ {../images/} }
 
 \definecolor{darkcerulean}{rgb}{0.03, 0.27, 0.49}
@@ -40,19 +41,29 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Utilización}
-
-Dummy text
-Dummy text
+\chapter{Diseño}
+\section{Diseño del Sistema}
+dshfdshfdshfds
+\section{IPCs}
+\subsection{Message Queue}
+	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento LIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro.
+\subsection{Señales} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Diseño}
-\section{Diseño del Sistema}
-asdf
-\section{IPCs}
-\subsection{Message Queue}
-	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento LIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro. 
+\chapter{Utilización}
+\section{Compilación y Ejecución}
+El sistema posee un archivo de tipo \textit{GNU make} que discrimina en la compilación del código fuente en base a qué proceso debería pertenecer, de este modo logra compilar separadamente los archivos binarios de manera autónoma. El programa debe recibir como argumento por línea de comandos una lista de archivos a procesar, también puede recibir una expresión \textit{bash} para los archivos (por ejemplo: ./*.c). Un ejemplo de uso del programa es el siguiente:
+\begin{lstlisting}
+/SO-TP1$ make
+/SO-TP1$ ./Binaries/run main.c
+\end{lstlisting}
+
+
+\section{Proceso Vista}
+El \textit{make} compila también de manera separada el proceso vista, para ejecutarlo se debe enviar el siguiente comando:
+\begin{lstlisting}
+\end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
