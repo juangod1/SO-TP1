@@ -14,9 +14,7 @@
 #include <sys/shm.h>
 #include <sys/ipc.h>
 #include <string.h>
-
-#define BUFFER_SIZE 32
-
+#include "view.h"
 
 
 void testPrintToTerminal();
@@ -106,25 +104,21 @@ int convertParameterStringToInt(char * param){
 }
 
 void createConnectionWithSharedMemory(key_t key){
-  
+
   //Attempting to locate the shared memory
   if((connectionId = shmget(key, BUFFER_SIZE, 0666)) < 0){
     perror("Failed to locate shared memory.\n");
     exit(1);
   }
-  printf("%d\n", connectionId);
 
   //Attempting to create a connection with data space
   if((readingAddress = shmat(connectionId, 0, 0)) == (char*) -1){
     perror("Failed to connect with data space.\n");
     exit(1);
   }
-
-  printf("%p\n", readingAddress);
 }
 
 void testBufferConnection(key_t key){
   createConnectionWithSharedMemory(key);
-  printf("%p\n", readingAddress);
-  printf("Este es el dato que recibo en el buffer --> %c\n", *readingAddress);
+  printf("Este es el dato que recibo en el buffer --> %s\n", readingAddress);
 }
