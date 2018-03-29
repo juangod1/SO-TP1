@@ -43,7 +43,7 @@ void run(int argc, const char ** argv, int testMode){
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
     FILE *fileToWrite;
-    fileToWrite =  fopen("hashDump.txt","a");
+    fileToWrite =  fopen("HashDump/hashDump.txt","a");
 
     // Creates shared memory buffer for view process and message queues for slave processes
     void * sharedBuffer = createBuffer(BUFFER_SIZE);
@@ -63,7 +63,7 @@ void run(int argc, const char ** argv, int testMode){
     sigact.sa_flags = 0;
     sigemptyset(&sigact.sa_mask);
     sigact.sa_handler = sigint;
-    if (sigaction(SIGINT, &sigact, NULL) < 0) {
+    if (sigaction(SIGHUP, &sigact, NULL) < 0) {
         perror("sigaction()");
         exit(-1);
     }
