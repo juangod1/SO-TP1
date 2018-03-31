@@ -30,6 +30,7 @@ void openSemaphores(sem_t ** semaphoreStatusPointer, sem_t **visualConnectedPoin
 void closeSemaphores(sem_t ** visualConnectedPointer, sem_t **semaphoreStatusPointer);
 void fetchSemaphoreValue(sem_t *semaphorePointer, int *semaphoreValue);
 void createBufferConnection(key_t key, char ** asignedBufferAddress);
+void cleanBufferConnections(key_t key);
 //Testing Buffer ToDelete
 void testBufferAlternate();
 
@@ -38,7 +39,9 @@ void run(int argc, const char ** argv, int testMode){
     char * bufferAddress;
 
     //Uncomment when testing ends
-    key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
+    key_t uniqueKeyPid = 1234;
+    //key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
+    cleanBufferConnections(uniqueKeyPid);
     createBufferConnection(uniqueKeyPid, &bufferAddress);
     
     int queueIDs[2]={0};
@@ -82,6 +85,11 @@ void run(int argc, const char ** argv, int testMode){
     createSlaves(numberOfFiles,testMode);
 
     //Process cycle
+    *((char *)bufferAddress) = RED;
+    *((char *)bufferAddress+1) = RED;
+    //Wait 10 seconds to be able to run view
+    sleep(10);
+
     while(hashCount != (numberOfFiles)){
         //This two variables can be moved to the beginning of "run".
         int visualIsConnected = *((char *)bufferAddress); // First byte of buffer
@@ -102,7 +110,6 @@ void run(int argc, const char ** argv, int testMode){
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"file hash: %s \n",hashBuffer);
                 // TODO: write hash to file on disc
-
                 *((char *)bufferAddress+1) = GREEN;
                 break;
             case GREEN:
@@ -118,6 +125,12 @@ void run(int argc, const char ** argv, int testMode){
         }
     }
     fclose(fileToWrite);
+    //Wait 2 seconds in case view did not finish printing and then disconnect
+    if(*((char *)bufferAddress)){
+        sleep(2);
+        *((char *)bufferAddress) = RED;
+    }
+    void cleanBufferConnections(key_t key);
 }
 
 void  createSlaves(int numberOfFiles, int testMode){
@@ -147,13 +160,15 @@ void  createSlaves(int numberOfFiles, int testMode){
 }
 
 
-//El key que recibe tiene que ser el PID del proceso actual.
-void createBufferConnection(key_t key, char ** asignedBufferAddress){
+void cleanBufferConnections(key_t key){
+    //Removes the shared memory asigned previously
     char buff[10+INT_MAX%10];
     sprintf(buff,"ipcrm -M %d", (int)key);
-    //Removes the shared memory asigned previously
     system(buff);
+}
 
+//El key que recibe tiene que ser el PID del proceso actual.
+void createBufferConnection(key_t key, char ** asignedBufferAddress){
     //Attempting to create the shared memory
     if((connectionId = shmget(key, BUFFER_SIZE, IPC_CREAT |0666)) < 0){
     perror("Failed to create shared memory.\n");
