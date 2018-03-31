@@ -13,8 +13,6 @@
 #include <string.h>
 #include "masterTest.h"
 
-void sigint(int);
-
 //Var for shared memory space. Cuando todo este funcionando, se pone su .h correspondiente
 #include <sys/types.h>
 #include <sys/shm.h>
@@ -58,15 +56,6 @@ void run(int argc, const char ** argv, int testMode){
         sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
     }
 
-    // Set the signal listener
-    struct sigaction sigact;
-    sigact.sa_flags = 0;
-    sigemptyset(&sigact.sa_mask);
-    sigact.sa_handler = sigint;
-    if (sigaction(SIGHUP, &sigact, NULL) < 0) {
-        perror("sigaction()");
-        exit(-1);
-    }
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
     // Process cycle
@@ -205,12 +194,4 @@ int slaveNumberCalculator(int numberOfFiles){
 void cleanBuffer(void * buff, int buffSize){
     for(int i=0; i<buffSize ; i++)
         *((char*)buff+i)=0;
-}
-
-void sigint(int signo)
-{
-    fflush(stdout);
-    printf("Error, exiting\n");
-    fflush(stdout);
-    exit(-1);
 }
