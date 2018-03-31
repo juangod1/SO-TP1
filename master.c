@@ -34,15 +34,11 @@ void createBufferConnection(key_t key, char ** asignedBufferAddress);
 void testBufferAlternate();
 
 void run(int argc, const char ** argv, int testMode){
-    //BufferAdress for shared memory & semaphore pointers
+    //BufferAdress for shared memory 
     char * bufferAddress;
-    sem_t *semaphoreStatusPointer, *visualConnectedPointer;
-    int * semaphoreStatusValue;
-    int * visualConnectedValue;
 
     //Uncomment when testing ends
-    //key_t uniqueKeyPid = getpid();
-    key_t uniqueKeyPid = 1234;
+    key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
     createBufferConnection(uniqueKeyPid, &bufferAddress);
     
     int queueIDs[2]={0};
@@ -84,43 +80,17 @@ void run(int argc, const char ** argv, int testMode){
     }
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
-    
 
-    //Process cycle with semaphore
-    openSemaphores(&visualConnectedPointer, &semaphoreStatusPointer);
-    
-    //TEST: Decomentando estas lineas de aca lo que hace es cerrar por las dudas las conexiones abiertas en 
-    //TEST: la ultima ejecucion debido al seg fault, luego volverlas a abrir para realizar pruebas utilizando 
-    //TEST: sem_post(puntero) incrementa uno
-    //TEST: sem_wait(puntero) decrementa uno
-    //TEST: fetch(puntero al semaforo, puntero al int retorno) levanta el valor del semaforo en puntero int
-    //TEST: Por ultimo se cierra la conexion y el while(1) corta la ejecucion  de lo siguiente. 
-    //TEST: Alguno se lo ocurre que pueda llegar a ser? 
-
-    // closeSemaphores(&visualConnectedPointer, &semaphoreStatusPointer);
-    // openSemaphores(&visualConnectedPointer, &semaphoreStatusPointer);
-    // fetchSemaphoreValue(semaphoreStatusPointer, semaphoreStatusValue);
-    // printf("%d\n", *semaphoreStatusValue);
-    // closeSemaphores(&visualConnectedPointer, &semaphoreStatusPointer);
-    // while(1);
-
+    //Process cycle
     while(hashCount != (numberOfFiles)){
+        //This two variables can be moved to the beginning of "run".
+        int visualIsConnected = *((char *)bufferAddress); // First byte of buffer
+        int semaphoreState = *((char *)bufferAddress+1); // Second byte of buffer
         char hashBuffer[HASH_SIZE+1] = {0};
-        
-        //Loads semaphoreStatus value
-        printf("Hola\n"); //TEST: Esto sucede. Utilizando sem_getValue crudo tampoco funciona.
-        //sem_getvalue(semaphoreStatusPointer, semaphoreStatusValue);
-        fetchSemaphoreValue(semaphoreStatusPointer, semaphoreStatusValue);
-        printf("Hola\n");//TEST: Esto no sucede
-        
-        //Loads visualConnected value
-        //sem_getvalue(visualConnectedPointer, visualConnectedValue);
-        fetchSemaphoreValue(visualConnectedPointer, visualConnectedValue);
 
-
-        switch(*semaphoreStatusValue){
+        switch(semaphoreState){
             case RED:
-                //cleanBuffer(bufferAddress, BUFFER_SIZE);
+                cleanBuffer(bufferAddress,BUFFER_SIZE);//This clean might 
                 if(isEmpty(HASHQ_ID)){
                   //printf("Queue is empty.... waiting\n");
                   break;
@@ -128,73 +98,26 @@ void run(int argc, const char ** argv, int testMode){
                 if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
                     hashCount++;
                 printf("Received message: %s\n",hashBuffer);
-                memcpy(bufferAddress,hashBuffer,HASH_SIZE);
+                memcpy(bufferAddress+2,hashBuffer,HASH_SIZE);
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"file hash: %s \n",hashBuffer);
                 // TODO: write hash to file on disc
 
-                //TODO: Handle error from semaphore
-                //Set semaphore status to GREEN by incrementing value
-                sem_post(semaphoreStatusPointer);
+                *((char *)bufferAddress+1) = GREEN;
                 break;
             case GREEN:
-                if(*visualConnectedValue){
-                    //Waits until the view finishes
-                    do{
-                        //sem_getvalue(semaphoreStatusPointer, semaphoreStatusValue);
-                        fetchSemaphoreValue(semaphoreStatusPointer, semaphoreStatusValue);
-                    }while(*semaphoreStatusValue);
+                if(visualIsConnected){
+                    while(*((char *)bufferAddress+1));
                 }
-                else{
-                    //Sets semaphore value into RED by decreasing its value.
-                    sem_wait(semaphoreStatusPointer);
-                }
+                else
+                    *((char *)bufferAddress+1) = RED;
                 break;
             default:
                 perror("Illegal semaphore state ERROR");
                 exit(-1);
         }
     }
-
-    // Process cycle
-    // while(hashCount != (numberOfFiles)){
-    //     int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
-    //     int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
-    //     char hashBuffer[HASH_SIZE+1] = {0};
-
-    //     switch(semaphoreState){
-    //         case RED:
-    //             cleanBuffer(sharedBuffer,BUFFER_SIZE);
-    //             if(isEmpty(HASHQ_ID)){
-    //               //printf("Queue is empty.... waiting\n");
-    //               break;
-    //             }
-    //             if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
-    //                 hashCount++;
-    //             printf("Received message: %s\n",hashBuffer);
-    //             memcpy(bufferAddress,hashBuffer,HASH_SIZE);
-    //             memcpy(sharedBuffer+2,hashBuffer,HASH_SIZE);
-    //             //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
-    //             fprintf(fileToWrite,"file hash: %s \n",hashBuffer);
-    //             // TODO: write hash to file on disc
-
-    //             *((char *)sharedBuffer+1) = GREEN;
-    //             break;
-    //         case GREEN:
-    //             if(visualIsConnected){
-    //                 while(*((char *)sharedBuffer+1));
-    //             }
-    //             else
-    //                 *((char *)sharedBuffer+1) = RED;
-    //             break;
-    //         default:
-    //             perror("Illegal semaphore state ERROR");
-    //             exit(-1);
-    //     }
-    // }
     fclose(fileToWrite);
-    closeSemaphores(&visualConnectedPointer, &semaphoreStatusPointer);
-    while(1);
 }
 
 void  createSlaves(int numberOfFiles, int testMode){
@@ -297,7 +220,8 @@ int slaveNumberCalculator(int numberOfFiles){
 }
 
 void cleanBuffer(void * buff, int buffSize){
-    for(int i=0; i<buffSize ; i++)
+    //Starts cleaning after the to semaphores
+    for(int i=2; i<buffSize ; i++)
         *((char*)buff+i)=0;
 }
 
