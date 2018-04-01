@@ -22,13 +22,14 @@ int testRun(mqd_t fileQueueDescriptor, mqd_t hashQueueDescriptor)
 }
 
 void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor){
+  printf("Testing getting an existing item from the queue...\n");
+  printf("Amount of elements in queue: %d\n descriptor ID: %d\n", numberOfMessages(fileQueueDescriptor), fileQueueDescriptor);
   givenAnExistingTestMessage();
   whenReadingQueueDescriptor();
   thenFoundMessage();
 }
 
 void   givenAnExistingTestMessage(){
-
 }
 
 void whenReadingQueueDescriptor(mqd_t fileQueueDescriptor){

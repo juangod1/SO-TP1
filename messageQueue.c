@@ -44,9 +44,13 @@ ssize_t getMessage(mqd_t queueDescriptor, size_t bufferSize, char * buffer){
     return ret;
 }
 
-void sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor){
+int sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor){
     if(mq_send(queueDescriptor,msg,msgLen,0)==-1)
+    {
         perror("mq_send ERROR");
+        return -1;
+    }
+    return 0;
 }
 
 void closeHashQueue(){

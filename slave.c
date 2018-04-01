@@ -29,9 +29,12 @@ int main(int argc, const char ** argv)
   fileQueueDescriptor = createQueue("/fileQueue",MAX_PATH_LEN,numberOfFiles,O_NONBLOCK);
   hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE,numberOfFiles,0);
 
+  printf("IN SLAVE: FileQ ID: %d, HashQ ID: %d\n\t#Elements FileQ ID: %d, #Elements HashQ ID: %d\n",fileQueueDescriptor,hashQueueDescriptor, numberOfMessages(fileQueueDescriptor), numberOfMessages(hashQueueDescriptor));
+
   if(isTest)
   {
-    testRun();
+    printf("FileQ ID: %d, HashQ ID: %d\n",fileQueueDescriptor,hashQueueDescriptor);
+    testRun(fileQueueDescriptor,hashQueueDescriptor);
     fflush(stdout);
     exit(1);
   }

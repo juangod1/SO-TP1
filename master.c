@@ -22,8 +22,8 @@ char * bufferAddress;
 void createBufferAlternate(key_t key);
 void testBufferAlternate();
 
-void run(int argc, const char ** argv, int testMode){
-
+void run(int argc, const char ** argv, int testMode)
+{
     int queueIDs[2]={0};
 
     if(testMode){
@@ -48,26 +48,30 @@ void run(int argc, const char ** argv, int testMode){
     createMasterQueues(numberOfFiles,queueIDs);
 
     //Testing alternateBuffer
-    testBufferAlternate();
+    //testBufferAlternate();
+    printf("UPON CREATION\tFileQ ID: %d, HashQ ID: %d\n", FILEQ_ID, HASHQ_ID);
 
     // Queue files for slaves to poll
-    for(int i=0; i<numberOfFiles; i++) {
-
+    for(int i=0; i<numberOfFiles; i++)
+    {
         sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
     }
 
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
     // Process cycle
-    while(hashCount != (numberOfFiles)){
+    while(hashCount != (numberOfFiles))
+    {
         int visualIsConnected = *((char *)sharedBuffer); // First byte of buffer
         int semaphoreState = *((char *)sharedBuffer+1); // Second byte of buffer
         char hashBuffer[HASH_SIZE+1] = {0};
 
-        switch(semaphoreState){
+        switch(semaphoreState)
+        {
             case RED:
                 cleanBuffer(sharedBuffer,BUFFER_SIZE);
-                if(isEmpty(HASHQ_ID)){
+                if(isEmpty(HASHQ_ID))
+                {
                   //printf("Queue is empty.... waiting\n");
                   break;
                 }
@@ -82,7 +86,8 @@ void run(int argc, const char ** argv, int testMode){
                 *((char *)sharedBuffer+1) = GREEN;
                 break;
             case GREEN:
-                if(visualIsConnected){
+                if(visualIsConnected)
+                {
                     while(*((char *)sharedBuffer+1));// TODO: espera no activa
                 }
                 else
@@ -96,7 +101,8 @@ void run(int argc, const char ** argv, int testMode){
     fclose(fileToWrite);
 }
 
-void  createSlaves(int numberOfFiles, int testMode){
+void  createSlaves(int numberOfFiles, int testMode)
+{
     int numberOfSlaves = slaveNumberCalculator(numberOfFiles);
     int pid;
     char numberOfFilesArr[ARG_MAX%10+1] = {};
@@ -112,11 +118,12 @@ void  createSlaves(int numberOfFiles, int testMode){
     parameters[2] = testModeArr;
     parameters[3] = (char *) NULL;
 
-    for(int i=0;i<numberOfSlaves;i++){
-        if( (pid=fork()) == 0){ // Child process
+    for(int i=0;i<numberOfSlaves;i++)
+    {
+        if( (pid=fork()) == 0)// Child process
+        {
             if(execv("./Binaries/slave", parameters) == -1)
                 perror("execv ERROR");
-
             exit(-1);
         }
     }
@@ -127,7 +134,8 @@ void  createSlaves(int numberOfFiles, int testMode){
 // When RED the master process cleans the buffer, reads a hash, writes the hash to the file output and sets the semaphore GREEN
 // When GREEN the view process reads from the buffer, displays the information and sets the semaphore RED
 // GREEN evaluates to true, while RED evaluates to false
-void * createBuffer(size_t size){
+void * createBuffer(size_t size)
+{
     int protection = PROT_READ | PROT_WRITE;
     int visibility = MAP_ANONYMOUS | MAP_SHARED;
     void * buffer = mmap(NULL, size, protection, visibility, 0, 0); // MAN PAGE: If addr is NULL, then the kernel chooses the address at which to create the mapping.
@@ -140,29 +148,30 @@ void * createBuffer(size_t size){
 
 
 //El key que recibe tiene que ser el PID del proceso actual.
-void createBufferAlternate(key_t key){
-
+void createBufferAlternate(key_t key)
+{
     //Attempting to create the shared memory
-  if((connectionId = shmget(key, BUFFER_SIZE, IPC_CREAT |0666)) < 0){
+  if((connectionId = shmget(key, BUFFER_SIZE, IPC_CREAT |0666)) < 0)
+  {
     perror("Failed to create shared memory.\n");
     exit(1);
   }
   printf("%d\n", connectionId);
 
   //Attempting to create a connection with data space
-  if((bufferAddress = (char*)shmat(connectionId, 0, 0)) == (char*) -1){
+  if((bufferAddress = (char*)shmat(connectionId, 0, 0)) == (char*) -1)
+  {
     perror("Failed to connect with data space.\n");
     exit(1);
   }
-
   printf("%p\n", bufferAddress);
-
-    //*(bufferAddress) = 0;
-    //*(bufferAddress+1) = RED; // Initializes semaphore as RED (Control to master proces)
+  //*(bufferAddress) = 0;
+  //*(bufferAddress+1) = RED; // Initializes semaphore as RED (Control to master proces)
 }
 
 //Test para bufferAlternate
-void testBufferAlternate(){
+void testBufferAlternate()
+{
     key_t key = 1234;
     createBufferAlternate(key);
     *bufferAddress = 'r';
@@ -172,7 +181,8 @@ void testBufferAlternate(){
 
 // Returns queueDescriptorArray with mqd_t of both queues
 // int[0] is fileQueue, int[1] is hashQueue
-int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
+int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray)
+{
     mqd_t fileQueue, hashQueue;
 
     closeFileQueue();
@@ -184,14 +194,17 @@ int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray){
     queueDescriptorArray[0] = fileQueue;
     queueDescriptorArray[1] = hashQueue;
 
+
     return queueDescriptorArray;
 }
 
-int slaveNumberCalculator(int numberOfFiles){
+int slaveNumberCalculator(int numberOfFiles)
+{
     return (int)ceil((double)(numberOfFiles)/PONDERATIVE_PROCESS_INDEX);
 }
 
-void cleanBuffer(void * buff, int buffSize){
+void cleanBuffer(void * buff, int buffSize)
+{
     for(int i=0; i<buffSize ; i++)
         *((char*)buff+i)=0;
 }
