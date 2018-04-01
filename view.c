@@ -63,7 +63,7 @@ int main(int argc, char ** argv)
   //Connect to master
   *((char *)readingAddress) = GREEN; // First byte of buffer
   int visualIsConnected = GREEN;
-  
+
   printf("Now testing bufferConnection\n");
   while(visualIsConnected){
 
@@ -119,17 +119,14 @@ void givenAChange(){
 
 void setString(char * stringValue)
 {
-  parameter=stringValue;
 }
 
 void whenPrintingToStandardOutput()
 {
-  printf("The parameter is: %s\n",parameter);
 }
 
 void testConnection()
 {
-  createConnectionWithSharedMemory(convertParameterStringToInt(parameter));
 }
 
 int convertParameterStringToInt(char * param)
