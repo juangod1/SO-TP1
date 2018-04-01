@@ -12,7 +12,7 @@ int main(int argc, const char ** argv){
     }
     if(argc == 2 && strcmp(argv[1], "test")==0) //test Mode check
     {
-      printf("Entering test mode...\n\t...\n\t\t...\n");
+      printf("\n_____________________________\n\n.....Entering test mode.....\n\n_____________________________\n\n");
       run(argc,argv,1);
     }
     else

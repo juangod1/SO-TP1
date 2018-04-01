@@ -15,13 +15,10 @@
 void createTestQueue(int *queueIDs)
 {
   const char * msg = "test";
-  createMasterQueues(1,queueIDs);
+  queueIDs=createMasterQueues(1,queueIDs);
   if(sendMessage(msg, sizeof(msg) ,FILEQ_ID)==0 && !isEmpty(FILEQ_ID))
   {
-    printf("Wrote \"test\" to queue,%d\nqueue ID: %d\n",numberOfMessages(FILEQ_ID),FILEQ_ID);
-    char buffer[10]={0};
-    getMessage(FILEQ_ID, 10, buffer);
-    printf("%s\n", buffer);
+    printf("Wrote \"test\" to queue\n",numberOfMessages(FILEQ_ID),FILEQ_ID);
   }
   else
   {

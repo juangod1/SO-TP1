@@ -31,7 +31,6 @@ int main(int argc, const char ** argv)
 
   if(isTest)
   {
-    printf("FileQ ID: %d, HashQ ID: %d\n",fileQueueDescriptor,hashQueueDescriptor);
     testRun(fileQueueDescriptor,hashQueueDescriptor);
     fflush(stdout);
     exit(1);
