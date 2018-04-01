@@ -15,6 +15,7 @@
 #include <math.h>
 #include <string.h>
 #include "masterTest.h"
+#include <sys/wait.h>
 
 //Var for shared memory space. Cuando todo este funcionando, se pone su .h correspondiente
 #include <sys/types.h>
@@ -30,13 +31,14 @@ void run(int argc, const char ** argv, int testMode)
     int queueIDs[2]={0};
 
     if(testMode){
-      int * status;
+      int * status=malloc(4); pid_t wpid;
       createTestQueue(queueIDs);
       createTestSlave();
-      wait(status);
+      while ((wpid = wait(status)) > 0); //wait for all child processes
       fflush(stdout);
       closeFileQueue();
       closeHashQueue();
+      free(status);
       exit(1);
     }
 

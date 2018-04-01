@@ -18,7 +18,7 @@ void createTestQueue(int *queueIDs)
   queueIDs=createMasterQueues(1,queueIDs);
   if(sendMessage(msg, sizeof(msg) ,FILEQ_ID)==0 && !isEmpty(FILEQ_ID))
   {
-    printf("Wrote \"test\" to queue\n",numberOfMessages(FILEQ_ID),FILEQ_ID);
+    printf("Wrote \"test\" to queue\n");
   }
   else
   {

@@ -23,7 +23,7 @@ int testRun(mqd_t fileQueueDescriptor, mqd_t hashQueueDescriptor)
 
 void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor){
   printf("Testing getting an existing item from the queue...\n");
-  printf("Amount of elements in queue: %d\n", numberOfMessages(fileQueueDescriptor), fileQueueDescriptor);
+  printf("Amount of elements in queue: %ld\n", numberOfMessages(fileQueueDescriptor));
   givenAnExistingTestMessage();
   whenReadingQueueDescriptor(fileQueueDescriptor);
   thenFoundMessage();
