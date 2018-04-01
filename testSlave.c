@@ -12,7 +12,7 @@
 
 char testPath[MAX_PATH_LEN];
 char buffer[MD5_LEN];
-char testBuffer[5];
+char testBuffer[MAX_PATH_LEN];
 
 int testRun(mqd_t fileQueueDescriptor, mqd_t hashQueueDescriptor)
 {
@@ -36,7 +36,7 @@ void   givenAnExistingTestMessage()
 
 void whenReadingQueueDescriptor(mqd_t fileQueueDescriptor)
 {
-    getMessage(fileQueueDescriptor, 5, testBuffer);
+    getMessage(fileQueueDescriptor, MAX_PATH_LEN, testBuffer);
 }
 
 void thenFoundMessage()

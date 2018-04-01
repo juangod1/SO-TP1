@@ -15,6 +15,7 @@
 void createTestQueue(int *queueIDs)
 {
   const char * msg = "test";
+
   queueIDs=createMasterQueues(1,queueIDs);
   if(sendMessage(msg, sizeof(msg) ,FILEQ_ID)==0 && !isEmpty(FILEQ_ID))
   {
