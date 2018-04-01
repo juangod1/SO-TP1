@@ -3,6 +3,9 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/mman.h>
 #include <signal.h>
 #include <linux/limits.h>
@@ -49,12 +52,19 @@ void run(int argc, const char ** argv, int testMode)
 
     //Testing alternateBuffer
     //testBufferAlternate();
-    printf("UPON CREATION\tFileQ ID: %d, HashQ ID: %d\n", FILEQ_ID, HASHQ_ID);
 
     // Queue files for slaves to poll
     for(int i=0; i<numberOfFiles; i++)
     {
-        sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
+        if(is_regular_file(argv[i+parametersOffset]))
+        {
+          sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
+        }
+        else
+        {
+          printf("%s Ignored. Not a regular file\n",argv[i+parametersOffset]);
+          numberOfFiles--;
+        }
     }
 
     // Launch slave processes
@@ -207,4 +217,10 @@ void cleanBuffer(void * buff, int buffSize)
 {
     for(int i=0; i<buffSize ; i++)
         *((char*)buff+i)=0;
+}
+int is_regular_file(const char *path)
+{
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
 }

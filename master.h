@@ -19,6 +19,7 @@
 
 
 void * createBuffer(size_t size);
+int is_regular_file(const char *path);
 int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray);
 int slaveNumberCalculator(int numberOfFiles);
 void  createSlaves(int numberOfFiles, int testMode);
