@@ -3,8 +3,8 @@
 ####################################
 
 CC = gcc
-CC_FLAGS = -Wall
-LINKER_OPTIONS = -lrt -lm -g
+CC_FLAGS = -Wall -pthread
+LINKER_OPTIONS = -lrt -lm -g -pthread
 
 SOURCES = $(wildcard *.c)
 SOURCES_AUX := $(SOURCES)

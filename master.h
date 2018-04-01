@@ -10,7 +10,7 @@
 #define RED 0
 #define GREEN 1
 #define HASH_SIZE 32
-#define BUFFER_SIZE 32
+#define BUFFER_SIZE (HASH_SIZE + FILENAME_MAX)
 #define FILEQ_ID queueIDs[0]
 #define HASHQ_ID queueIDs[1]
 #define QID_MAX_DIGITS 5
