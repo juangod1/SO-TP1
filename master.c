@@ -30,7 +30,8 @@ void run(int argc, const char ** argv, int testMode)
 {
     int queueIDs[2]={0};
 
-    if(testMode){
+    if(testMode)
+    {
       int * status=malloc(4); pid_t wpid;
       createTestQueue(queueIDs);
       createTestSlave();

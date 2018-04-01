@@ -21,7 +21,8 @@ int testRun(mqd_t fileQueueDescriptor, mqd_t hashQueueDescriptor)
     return 0;
 }
 
-void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor){
+void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor)
+{
   printf("Testing getting an existing item from the queue...\n");
   printf("Amount of elements in queue: %ld\n", numberOfMessages(fileQueueDescriptor));
   givenAnExistingTestMessage();
@@ -29,24 +30,30 @@ void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor){
   thenFoundMessage();
 }
 
-void   givenAnExistingTestMessage(){
+void   givenAnExistingTestMessage()
+{
 }
 
-void whenReadingQueueDescriptor(mqd_t fileQueueDescriptor){
+void whenReadingQueueDescriptor(mqd_t fileQueueDescriptor)
+{
     getMessage(fileQueueDescriptor, 5, testBuffer);
 }
 
-void thenFoundMessage(){
-  if(strcmp(testBuffer,"test")==0){
+void thenFoundMessage()
+{
+  if(strcmp(testBuffer,"test")==0)
+  {
     Ok();
   }
-  else{
+  else
+  {
     printf("Expected: \"test\" found %s: \n", testBuffer);
     Fail();
   }
 }
 
-void testExistingFilePrint(){
+void testExistingFilePrint()
+{
   printf("Testing Existing File Print...  \n");
   givenExistingFile();
 
@@ -55,7 +62,8 @@ void testExistingFilePrint(){
   thenValueIsNotNull(buffer);
 }
 
-void thenValueIsNotNull(char *buffer){
+void thenValueIsNotNull(char *buffer)
+{
   if(buffer!=NULL){
     printf("%s\n",buffer);
     Ok();

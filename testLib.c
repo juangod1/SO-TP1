@@ -1,14 +1,17 @@
 #include "testLib.h"
 #include <stdio.h>
 
-void Ok(){
+void Ok()
+{
   printf("      Ok!\n");
 }
 
-void thenSuccess(){
+void thenSuccess()
+{
   Ok();
 }
 
-void Fail(){
+void Fail()
+{
   printf("      Failed\n");
 }
