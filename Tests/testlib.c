@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include "testlib.h"
 
 void checkIsNotNull(void * pointer)
@@ -21,7 +21,7 @@ void checkStringsEqual(char* str1, char* str2)
     {
         fail("Expected: two equal strings, recieved: two different strings");
     }
-    else()
+    else
     {
         ok();
     }

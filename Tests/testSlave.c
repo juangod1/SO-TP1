@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include "testSlave.h"
 #include "testlib.h"
-#include "slave.h"
-#include "messageQueue.h"
+#include "../slave.h"
+#include "../messageQueue.h"
 
 char testPath[MAX_PATH_LEN];
 char buffer[MD5_LEN];
@@ -43,12 +43,13 @@ void thenFoundMessage()
 {
   if(strcmp(testBuffer,"test")==0)
   {
-    Ok();
+    ok();
   }
   else
   {
-    printf("Expected: \"test\" found %s: \n", testBuffer);
-    Fail();
+    char errormsg[50]={0};
+    sprintf(errormsg,"Expected: \"test\" found %s: \n", testBuffer);
+    fail(errormsg);
   }
 }
 
@@ -66,10 +67,10 @@ void thenValueIsNotNull(char *buffer)
 {
   if(buffer!=NULL){
     printf("%s\n",buffer);
-    Ok();
+    ok();
     return;
   }
-  Fail();
+  fail("Value is null");
 }
 
 void givenExistingFile()

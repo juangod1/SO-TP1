@@ -2,31 +2,21 @@
 #include <stdio.h>
 
 #include "testlib.h"
+#include "testBuffer.h"
 
-void createBufferTest();
-void readWriteBufferTest();
 
-void givenAKey();
-void givenABuffer();
-void givenAStringToWrite();
-
-void whenAllocatingBufferSpace();
-void whenWritingStringToBuffer();
-void whenReadingStringFromBuffer();
-
-void thenStringsMatch();
-void thenSomeBufferIsCreated();
-
-void * buffer;
+char * buffer;
+char * readString;
 key_t key;
 char * string;
+char * writeString;
 
 int main()
 {
     printf("Test create buffer: ");
-    creteBufferTest();
+    createBufferTest();
 
-    printf("Test read write buffer: ")
+    printf("Test read write buffer: ");
     readWriteBufferTest();
 }
 
@@ -55,7 +45,7 @@ void whenAllocatingBufferSpace()
 {
     //para que quede mas limpio se le tiene que pasar
     //el adress por parametro a createBufferAlternate
-    createBufferAlternate(key, buffer);
+    //createBufferAlternate(key, buffer); ESTA FUNCION NO EXISTE
 }
 
 void thenSomeBufferIsCreated()
@@ -65,7 +55,7 @@ void thenSomeBufferIsCreated()
 
 void givenABuffer()
 {
-    createBufferAlternate(key, buffer);
+    //createBufferAlternate(key, buffer); ESTA FUNCION NO EXISTE
 }
 
 void givenAStringToWrite()
@@ -75,7 +65,7 @@ void givenAStringToWrite()
 
 void whenWritingStringToBuffer()
 {
-    *buffer = writeString;
+    buffer = (char*)writeString;
 }
 
 void whenReadingStringFromBuffer()
@@ -85,5 +75,5 @@ void whenReadingStringFromBuffer()
 
 void thenStringsMatch()
 {
-    checkStringsEqual(readstring, writeString);
+    checkStringsEqual(readString, writeString);
 }

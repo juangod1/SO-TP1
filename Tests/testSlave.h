@@ -1,4 +1,4 @@
-#include "messageQueue.h"
+#include "../messageQueue.h"
 
 #ifndef TEST_SLAVE_H
 #define TEST_SLAVE_H

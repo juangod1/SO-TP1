@@ -10,5 +10,7 @@ void setString(char * stringValue);
 void whenPrintingToStandardOutput();
 void testConnection();
 void testBufferConnection(key_t key);
+void givenAString();
+void givenAChange();
 
 #endif
