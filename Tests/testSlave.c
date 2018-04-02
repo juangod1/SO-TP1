@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include "testSlave.h"
-#include "testLib.h"
+#include "testlib.h"
 #include "slave.h"
 #include "messageQueue.h"
 

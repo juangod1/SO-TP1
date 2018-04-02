@@ -27,14 +27,19 @@ void checkStringsEqual(char* str1, char* str2)
     }
 }
 
+void thenSuccess()
+{
+  ok();
+}
+
 void ok()
 {
-    printf("    Ok!\n");
+    printf("\tOk!\n");
 }
 
 void fail(char * errorMsg)
 {
-    putchar("\n");
+    printf("\tFailed\n");
     fprintf(stderr, "%s", errorMsg);
 }
 

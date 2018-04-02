@@ -12,13 +12,16 @@ SOURCES = $(filter-out $(VIEW),$(filter-out $(SLAVE),$(SOURCES_AUX))) # Removes 
 OBJECTS = $(foreach source, $(SOURCES:.c=.o), Binaries/$(source)) # Appends string for object files to be stored in Binaries directory
 EXEC = run # Binary name
 
-SLAVE = slave.c testSlave.c
+SLAVE = slave.c Tests/testSlave.c
 SLAVE_OBJECTS = $(foreach source, $(SLAVE:.c=.o), Binaries/$(source)) # Same as line 12
 EXEC_SLAVE = slave # Binary name
 
 VIEW = view.c
 VIEW_OBJECTS = $(foreach source, $(VIEW:.c=.o), Binaries/$(source)) # Same as line 12
 EXEC_VIEW = view # Binary name
+
+SOURCES_TEST = $(wildcard Tests/*.c)
+OBJECTS_TEST = $(foreach source, $(SOURCES_TEST:.c=.o), Binaries/$(source))
 
 ####################################
 ####      COMPILATION           ####
@@ -35,8 +38,8 @@ all: binaries_setup hashdump_setup clean main_binary slave view
 clean:
 	rm -f Binaries/*
 
-main_binary: clean $(OBJECTS)
-	$(CC) $(OBJECTS) -o Binaries/$(EXEC) $(LINKER_OPTIONS)
+main_binary: clean $(OBJECTS) $(OBJECTS_TEST)
+	$(CC) $(OBJECTS) $(OBJECTS_TEST) -o Binaries/$(EXEC) $(LINKER_OPTIONS)
 
 slave: $(SLAVE_OBJECTS)
 	$(CC) $(SLAVE_OBJECTS) Binaries/testLib.o Binaries/messageQueue.o -o Binaries/$(EXEC_SLAVE) $(LINKER_OPTIONS)

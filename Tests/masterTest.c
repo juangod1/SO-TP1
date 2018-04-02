@@ -3,8 +3,8 @@
 #include <sys/mman.h>
 #include <signal.h>
 #include <linux/limits.h>
-#include "master.h"
-#include "messageQueue.h"
+#include "../master.h"
+#include "../messageQueue.h"
 #include <unistd.h>
 #include <math.h>
 #include <string.h>

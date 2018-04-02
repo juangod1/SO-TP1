@@ -5,3 +5,4 @@ void checkIsNotNull(void * pointer);
 void ok();
 void fail(char * errorMsg);
 void notImplemented();
+void thenSuccess();

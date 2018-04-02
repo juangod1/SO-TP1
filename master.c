@@ -14,9 +14,9 @@
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
-#include "masterTest.h"
 #include <limits.h>
 #include <sys/wait.h>
+#include "Tests/masterTest.h"
 
 //Var for shared memory space. Cuando todo este funcionando, se pone su .h correspondiente
 #include <sys/types.h>

@@ -1,7 +1,7 @@
 #ifndef TESTLIB_H
 #define TESTLIB_H
 
-void thenSuccess();
+v
 void Fail();
 void Ok();
 

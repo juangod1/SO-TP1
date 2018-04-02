@@ -9,4 +9,10 @@
 #define GREEN 1
 #define RED 0
 
+int convertParameterStringToInt(char * param);
+char * createConnectionWithSharedMemory(key_t key);
+void printSemaphores(char * address);
+
+
+
 #endif //SO_TP1_VIEW_H
