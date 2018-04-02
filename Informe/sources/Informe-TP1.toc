@@ -9,10 +9,15 @@
 \contentsline {section}{\numberline {2.2}Proceso Vista}{3}
 \contentsline {chapter}{\numberline {3}Problemas y Resoluciones}{4}
 \contentsline {section}{\numberline {3.1}Proceso Maestro}{4}
+\contentsline {subsection}{\numberline {3.1.1}Problema de espera activo}{4}
+\contentsline {subsection}{\numberline {3.1.2}\textit {Hasheo} de archivos}{4}
 \contentsline {section}{\numberline {3.2}Proceso Esclavo}{4}
 \contentsline {section}{\numberline {3.3}Proceso Vista}{4}
-\contentsline {chapter}{\numberline {4}Limitaciones}{5}
-\contentsline {section}{\numberline {4.1}Limitaciones del Sistema}{5}
-\contentsline {section}{\numberline {4.2}Limitaciones de la Implementaci\IeC {\'o}n}{5}
-\contentsline {chapter}{\numberline {5}Bibliograf\IeC {\'\i }a}{6}
-\contentsline {section}{\numberline {5.1}Extractos de c\IeC {\'o}digo}{6}
+\contentsline {chapter}{\numberline {4}Testing}{5}
+\contentsline {section}{\numberline {4.1}Sistema de Testing}{5}
+\contentsline {section}{\numberline {4.2}Fugas de Memoria}{5}
+\contentsline {chapter}{\numberline {5}Limitaciones}{7}
+\contentsline {section}{\numberline {5.1}Limitaciones del Sistema}{7}
+\contentsline {section}{\numberline {5.2}Limitaciones de la Implementaci\IeC {\'o}n}{7}
+\contentsline {chapter}{\numberline {6}Bibliograf\IeC {\'\i }a}{8}
+\contentsline {section}{\numberline {6.1}Extractos de c\IeC {\'o}digo}{8}

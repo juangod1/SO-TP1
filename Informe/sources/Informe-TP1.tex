@@ -70,13 +70,75 @@ El \textit{make} compila también de manera separada el proceso vista, para ejec
 \chapter{Problemas y Resoluciones}
 \section{Proceso Maestro}
 \subsection{Problema de espera activo}
-msq_recieve con block asi no hace espera activa sino que el SO lo despierta cuando la queue cambia de empty a nonempty
+msq recieve con block asi no hace espera activa sino que el SO lo despierta cuando la queue cambia de empty a nonempty
+\subsection{\textit{Hasheo} de archivos}
+Nos vimos ante la necesidad de utilizar la función de Linux md5sum para conseguir el hash de los archivos. Sin embargo este función
+era únicamente accesible a través de línea de comandos de Linux y no en el entorno de biblioteca de funciones de c. Al no tener las
+herramientas para crear una función propia debimos encontrar otra solución para el problema.
+
+Luego de investigación en Internet se propuso utilizar la función popen() con parámetro cmd que ejecuta un proceso de línea de comandos
+de Linux y a través de él ejecutar la función md5sum con los parámetros correspondientes. Luego la salida de la ejecución de las funciones
+es traída al entorno de la aplicación con la función fgets.
 \section{Proceso Esclavo}
 sdfasdf
 \section{Proceso Vista}
 
 asdfadsf
 Dummy text
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Testing}
+\section{Sistema de Testing}
+asdfasldjfasd
+
+\section{Fugas de Memoria}
+Era posible la presencia de fugas de memoria en cualquiera de los tres procesos, las fugas de memoria
+son errores de software que ocurren cuando los bloques de memoria reservados no son liberados antes de la finalización del programa.
+Para asegurar la ausencia de fugas de memoria se tomo el recaudo de utilizar la herramienta \textit{Valgrind}. A continuación se encuentran
+los registros del programa para distintos parámetros.
+\\\\ Registros de Valgrind:
+\begin{lstlisting}
+>>valgrind ./Binaries/run ./*
+
+==7295==
+==7295== HEAP SUMMARY:
+==7295==     in use at exit: 0 bytes in 0 blocks
+==7295==   total heap usage: 11 allocs, 11 frees, 17,528 bytes allocated
+==7295==
+==7295== All heap blocks were freed -- no leaks are possible
+==7295==
+==7295== For counts of detected and suppressed errors, rerun with: -v
+==7295== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+
+>>valgrind ./Binaries/view 1234
+
+==7550==
+==7550== HEAP SUMMARY:
+==7550==     in use at exit: 0 bytes in 0 blocks
+==7550==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
+==7550==
+==7550== All heap blocks were freed -- no leaks are possible
+==7550==
+==7550== For counts of detected and suppressed errors, rerun with: -v
+==7550== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+
+>>valgrind ./Binaries/slave a a
+
+==8156==
+==8156== HEAP SUMMARY:
+==8156==     in use at exit: 0 bytes in 0 blocks
+==8156==   total heap usage: 4 allocs, 4 frees, 8,704 bytes allocated
+==8156==
+==8156== All heap blocks were freed -- no leaks are possible
+==8156==
+==8156== For counts of detected and suppressed errors, rerun with: -v
+==8156== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+\end{lstlisting}
+Podemos afirmar que para los casos vistos nuestros programas no presentan fugas de memoria.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -92,7 +154,10 @@ Dummy text
 
 \chapter{Bibliografía}
 \section{Extractos de código}
+\begin{enumerate}
+\item https://stackoverflow.com/questions/3395690/md5sum-of-file-in-linux-c
+\item https://stackoverflow.com/questions/4553012/checking-if-a-file-is-a-directory-or-just-a-file
 
-Dummy text
+\end{enumerate}
 
 \end{document}
