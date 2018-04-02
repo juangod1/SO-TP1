@@ -61,13 +61,13 @@ int sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor)
 
 void closeHashQueue(){
     if(mq_unlink("/hashQueue")==-1);
-        //perror("no /hashQueue previously left open... (mq_unlink) ");
+        perror("no /hashQueue previously left open... (mq_unlink) ");
 }
 
 void closeFileQueue()
 {
     if(mq_unlink("/fileQueue")==-1);
-        //perror("no /fileQueue previously left open... (mq_unlink) ");
+        perror("no /fileQueue previously left open... (mq_unlink) ");
 }
 
 int isEmpty(mqd_t queueID)
@@ -90,5 +90,6 @@ int readSystemMaxMsg()
     FILE *file = popen("cat /proc/sys/fs/mqueue/msg_max","r");
     char buffer[7];
     fgets(buffer,6,file);
+    pclose(file);
     return (int)strtol(buffer,NULL,BASE10);
 }

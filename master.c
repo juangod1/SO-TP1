@@ -94,7 +94,7 @@ void run(int argc, const char ** argv, int testMode){
     //Wait 10 seconds to be able to run view
     sleep(10);
 
-    while(hashCount != (numberOfFiles)){
+    while(hashCount < (numberOfFiles)){
         //This two variables can be moved to the beginning of "run".
         char hashBuffer[HASH_SIZE+1] = {0};
 
@@ -164,7 +164,8 @@ void  createSlaves(int numberOfFiles, int testMode)
 }
 
 
-void cleanBufferConnections(key_t key){
+void cleanBufferConnections(key_t key)
+{
     //Removes the shared memory asigned previously
     char buff[10+INT_MAX%10];
     sprintf(buff,"ipcrm -M %d", (int)key);
@@ -172,16 +173,19 @@ void cleanBufferConnections(key_t key){
 }
 
 //El key que recibe tiene que ser el PID del proceso actual.
-void createBufferConnection(key_t key, char ** asignedBufferAddress){
+void createBufferConnection(key_t key, char ** asignedBufferAddress)
+{
     //Attempting to create the shared memory
-    if((connectionId = shmget(key, BUFFER_SIZE, IPC_CREAT |0666)) < 0){
-    perror("Failed to create shared memory.\n");
-    exit(-1);
+    if((connectionId = shmget(key, BUFFER_SIZE, IPC_CREAT |0666)) < 0)
+    {
+      perror("Failed to create shared memory.\n");
+      exit(-1);
     }
     //Attempting to create a connection with data space
-    if(((*asignedBufferAddress) = (char*)shmat(connectionId, 0, 0)) == (char*) -1){
-    perror("Failed to connect with data space.\n");
-    exit(-1);
+    if(((*asignedBufferAddress) = (char*)shmat(connectionId, 0, 0)) == (char*) -1)
+    {
+      perror("Failed to connect with data space.\n");
+      exit(-1);
     }
 
     //*(bufferAddress) = 0;
@@ -189,21 +193,25 @@ void createBufferConnection(key_t key, char ** asignedBufferAddress){
 }
 
 //Opens two semaphores to comunicate with the view.
-void openSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer){
+void openSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer)
+{
     //Visual connection with initial value 0
-    if((*visualConnectedPointer = sem_open("/visualConnected", O_CREAT, 0660, 0)) == SEM_FAILED){
+    if((*visualConnectedPointer = sem_open("/visualConnected", O_CREAT, 0660, 0)) == SEM_FAILED)
+    {
         perror("Failed to open visual semaphore\n");
         exit(-1);
     }
     //Semaphore state with initial value 0
-    if((*semaphoreStatusPointer = sem_open("/semaphoreStatus", O_CREAT, 0660, 0)) == SEM_FAILED){
+    if((*semaphoreStatusPointer = sem_open("/semaphoreStatus", O_CREAT, 0660, 0)) == SEM_FAILED)
+    {
         perror("Failed to open status semaphore\n");
         exit(-1);
     }
 }
 
 //Closes the semaphores. Handle errors
-void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer){
+void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer)
+{
     sem_unlink("/visualConnected");
     sem_close(*visualConnectedPointer);
     sem_unlink("/semaphoreStatus");
@@ -211,8 +219,10 @@ void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPo
 }
 
 //Fetch semaphore value and deposit in pointer to int. Checking for error
-void fetchSemaphoreValue(sem_t *semaphorePointer, int *semaphoreValue){
-    if(sem_getvalue(semaphorePointer, semaphoreValue) == -1){
+void fetchSemaphoreValue(sem_t *semaphorePointer, int *semaphoreValue)
+{
+    if(sem_getvalue(semaphorePointer, semaphoreValue) == -1)
+    {
             perror("Failed to fetch status from semaphore\n");
     }
 }
@@ -252,13 +262,3 @@ int is_regular_file(const char *path)
     stat(path, &path_stat);
     return S_ISREG(path_stat.st_mode);
 }
-
-//Tests del Buffer Address ToDelete
-// void testBufferAlternate(char * hashBufferTest){
-//     key_t key = getpid();
-//     createBufferAlternate(key);
-
-//     memcpy(bufferAddress,hashBufferTest,BUFFER_SIZE);
-
-//     printf("Este es el dato que guardo en el buffer --> %s\n", bufferAddress);
-// }
