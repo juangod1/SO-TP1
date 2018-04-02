@@ -21,6 +21,8 @@ VIEW_OBJECTS = $(foreach source, $(VIEW:.c=.o), Binaries/$(source)) # Same as li
 EXEC_VIEW = view # Binary name
 
 SOURCES_TEST = $(wildcard Tests/*.c)
+SOURCES_TEST_AUX := $(SOURCES_TEST)
+SOURCES_TEST = $(subst Tests/,,$(SOURCES_TEST_AUX))     #$(foreach source, $(SOURCES_TEST_AUX:Tests/=), $(source))
 OBJECTS_TEST = $(foreach source, $(SOURCES_TEST:.c=.o), Binaries/$(source))
 
 ####################################
@@ -28,6 +30,9 @@ OBJECTS_TEST = $(foreach source, $(SOURCES_TEST:.c=.o), Binaries/$(source))
 ####################################
 
 Binaries/%.o: %.c
+	$(CC) -c $(CC_FLAGS) $< -o $@
+
+Binaries/%.o: Tests/%.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
 
 %.o: %.c
