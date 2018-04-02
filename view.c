@@ -16,22 +16,8 @@
 #include <string.h>
 #include "view.h"
 
-
-void testPrintToTerminal();
-void testPrintArgumentToTerminal();
-void testPrintAfterChange();
-
-void givenAString();
-void givenAChange();
-
-void whenPrintingToStandardOutput();
-
-void setString(char * stringValue);
-
 int convertParameterStringToInt(char * param);
 char * createConnectionWithSharedMemory(key_t key);
-void testConnection();
-void testBufferConnection(key_t key);
 void printSemaphores(char * address);
 
 
@@ -87,51 +73,6 @@ int main(int argc, char ** argv)
 
 }
 
-void testPrintAfterChange()
-{
-  givenAString();
-  givenAChange();
-
-  whenPrintingToStandardOutput();
-
-  thenSuccess();
-}
-
-void testPrintToTerminal()
-{
-  givenAString();
-  whenPrintingToStandardOutput();
-  thenSuccess();
-}
-
-void testPrintArgumentToTerminal()
-{
-  whenPrintingToStandardOutput();
-  thenSuccess();
-}
-
-void givenAString()
-{
-  setString("String");
-}
-
-void givenAChange()
-{
-  setString("Change");
-}
-
-void setString(char * stringValue)
-{
-}
-
-void whenPrintingToStandardOutput()
-{
-}
-
-void testConnection()
-{
-}
-
 int convertParameterStringToInt(char * param)
 {
   return atoi(param);
@@ -162,11 +103,6 @@ char * createConnectionWithSharedMemory(key_t key)
     exit(-1);
   }
   return readingAddress;
-}
-
-void testBufferConnection(key_t key)
-{
-  createConnectionWithSharedMemory(key);
 }
 
 void printSemaphores(char * address)
