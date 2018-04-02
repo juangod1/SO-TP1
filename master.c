@@ -46,6 +46,10 @@ void run(int argc, const char ** argv, int testMode){
     cleanBufferConnections(uniqueKeyPid);
     createBufferConnection(uniqueKeyPid, &bufferAddress);
 
+    sem_t * visSem;
+    sem_t * semSem;
+    openSemaphores(&visSem,&semSem);
+
     int queueIDs[2]={0};
 
     if(testMode)
@@ -115,10 +119,11 @@ void run(int argc, const char ** argv, int testMode){
                 fprintf(fileToWrite,"%s\n",hashBuffer);
                 // TODO: write hash to file on disc
                 *((char *)bufferAddress+2) = GREEN;
+                sem_post(semSem);
                 break;
             case GREEN:
                 if(*((char *)bufferAddress+1)){
-                    while(*((char *)bufferAddress+2));
+                    sem_wait(visSem);
                 }
                 else
                     *((char *)bufferAddress+2) = RED;
@@ -129,12 +134,17 @@ void run(int argc, const char ** argv, int testMode){
         }
     }
     fclose(fileToWrite);
-    //Wait 2 seconds in case view did not finish printing and then disconnect
+
+    //Disconnect the visual process
     if(*((char *)bufferAddress+1)){
-        sleep(2);
         *((char *)bufferAddress+1) = RED;
+        *((char *)bufferAddress+2) = RED;
+        sem_post(semSem);
     }
+
+    //Close connections 
     cleanBufferConnections(uniqueKeyPid);
+    closeSemaphores(&visSem, &semSem);
 }
 
 void  createSlaves(int numberOfFiles, int testMode)

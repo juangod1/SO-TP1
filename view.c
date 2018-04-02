@@ -15,10 +15,13 @@
 #include <sys/ipc.h>
 #include <string.h>
 #include "view.h"
+#include <semaphore.h>
 
 int convertParameterStringToInt(char * param);
 char * createConnectionWithSharedMemory(key_t key);
 void printSemaphores(char * address);
+void openSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer);
+void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer);
 
 
 
@@ -37,6 +40,10 @@ int main(int argc, char ** argv)
   char * readingAddress;
   //Starting buffer connection
   readingAddress = createConnectionWithSharedMemory(connectionId);
+  
+  sem_t * visSem;
+  sem_t * semSem;
+  openSemaphores(&visSem,&semSem);
 
   // printf("Testing Print parameter to terminal...\n");
   // testPrintArgumentToTerminal();
@@ -46,31 +53,28 @@ int main(int argc, char ** argv)
   // testPrintAfterChange();
 
   //Connect to master
-  *((char *)readingAddress+1) = GREEN; // First byte of buffer
-  int visualIsConnected = GREEN;
+  *((char *)readingAddress+1) = GREEN; // Second byte of buffer
 
-  printf("Now testing bufferConnection\n");
-  while(visualIsConnected)
+  printf("This is the view for the hashing process with PID: %d\n", connectionId);
+  while(*((char *)readingAddress+1))
   {
+    int semaphoreState = *((char *)readingAddress+2); // Third byte of buffer
 
-        visualIsConnected = *((char *)readingAddress+1); // First byte of buffer
-        int semaphoreState = *((char *)readingAddress+2); // Second byte of buffer
-
-        switch(semaphoreState)
-        {
-            case GREEN:
-                printf("%s\n",readingAddress+3);
-                *((char *)readingAddress+2) = RED;
-                break;
-            case RED:
-                 while(!(*((char *)readingAddress+2)) && (*((char *)readingAddress+1)));
-                break;
-            default:
-                perror("Illegal semaphore state ERROR");
-                exit(-1);
-        }
+    switch(semaphoreState)
+    {
+        case GREEN:
+            printf("%s\n",readingAddress+3);
+            *((char *)readingAddress+2) = RED;
+            sem_post(visSem);
+            break;
+        case RED:                      
+            sem_wait(semSem);
+            break;
+        default:
+            perror("Illegal semaphore state ERROR");
+            exit(-1);
     }
-
+    }
 }
 
 int convertParameterStringToInt(char * param)
@@ -108,4 +112,29 @@ char * createConnectionWithSharedMemory(key_t key)
 void printSemaphores(char * address)
 {
   printf("Visual:%d, Semaphore:%d\n",(char)*((char *)address),(char)*((char *)address+1));
+}
+
+void openSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer)
+{
+    //Visual connection with initial value 0
+    if((*visualConnectedPointer = sem_open("/visualConnected", O_CREAT, 0660, 0)) == SEM_FAILED)
+    {
+        perror("Failed to open visual semaphore\n");
+        exit(-1);
+    }
+    //Semaphore state with initial value 0
+    if((*semaphoreStatusPointer = sem_open("/semaphoreStatus", O_CREAT, 0660, 0)) == SEM_FAILED)
+    {
+        perror("Failed to open status semaphore\n");
+        exit(-1);
+    }
+}
+
+//Closes the semaphores. Handle errors
+void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPointer)
+{
+    sem_unlink("/visualConnected");
+    sem_close(*visualConnectedPointer);
+    sem_unlink("/semaphoreStatus");
+    sem_close(*semaphoreStatusPointer);
 }
