@@ -62,5 +62,5 @@ void testConnection()
 
 void testBufferConnection(key_t key)
 {
-  createConnectionWithSharedMemory(key);
+  //createConnectionWithSharedMemory(key);
 }

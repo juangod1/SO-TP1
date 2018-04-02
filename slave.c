@@ -9,10 +9,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
-#include "testSlave.h"
+#include "Tests/testSlave.h"
 #include "messageQueue.h"
 #include "slave.h"
-#include "testLib.h"
+#include "Tests/testlib.h"
 
 // Receives three arguments, program name, number of files and isTest
 int main(int argc, const char ** argv)

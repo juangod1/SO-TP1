@@ -11,14 +11,14 @@ key_t key;
 char * string;
 char * writeString;
 
-int main()
+/*int main()
 {
     printf("Test create buffer: ");
     createBufferTest();
 
     printf("Test read write buffer: ");
     readWriteBufferTest();
-}
+}*/
 
 void createBufferTest()
 {

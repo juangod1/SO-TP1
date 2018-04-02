@@ -1,7 +1,7 @@
 //
 // Created by juangod on 24/03/18.
 //
-#include "testLib.h"
+#include "Tests/testlib.h"
 #include "messageQueue.h"
 #include <stdio.h>
 #include <stdlib.h>

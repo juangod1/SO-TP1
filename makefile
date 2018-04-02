@@ -13,7 +13,8 @@ OBJECTS = $(foreach source, $(SOURCES:.c=.o), Binaries/$(source)) # Appends stri
 EXEC = run # Binary name
 
 SLAVE = slave.c Tests/testSlave.c
-SLAVE_OBJECTS = $(foreach source, $(SLAVE:.c=.o), Binaries/$(source)) # Same as line 12
+SLAVE_AUX = $(subst Tests/,,$(SLAVE))
+SLAVE_OBJECTS = $(foreach source, $(SLAVE_AUX:.c=.o), Binaries/$(source)) # Same as line 12
 EXEC_SLAVE = slave # Binary name
 
 VIEW = view.c
@@ -22,7 +23,9 @@ EXEC_VIEW = view # Binary name
 
 SOURCES_TEST = $(wildcard Tests/*.c)
 SOURCES_TEST_AUX := $(SOURCES_TEST)
-SOURCES_TEST = $(subst Tests/,,$(SOURCES_TEST_AUX))     #$(foreach source, $(SOURCES_TEST_AUX:Tests/=), $(source))
+SOURCES_TEST = $(filter-out $(VIEW),$(filter-out $(SLAVE),$(SOURCES_TEST_AUX)))
+SOURCES_TEST_AUX2 := $(SOURCES_TEST)
+SOURCES_TEST = $(subst Tests/,,$(SOURCES_TEST_AUX2))     #$(foreach source, $(SOURCES_TEST_AUX:Tests/=), $(source))
 OBJECTS_TEST = $(foreach source, $(SOURCES_TEST:.c=.o), Binaries/$(source))
 
 ####################################
@@ -47,10 +50,10 @@ main_binary: clean $(OBJECTS) $(OBJECTS_TEST)
 	$(CC) $(OBJECTS) $(OBJECTS_TEST) -o Binaries/$(EXEC) $(LINKER_OPTIONS)
 
 slave: $(SLAVE_OBJECTS)
-	$(CC) $(SLAVE_OBJECTS) Binaries/testLib.o Binaries/messageQueue.o -o Binaries/$(EXEC_SLAVE) $(LINKER_OPTIONS)
+	$(CC) $(SLAVE_OBJECTS) Binaries/testlib.o Binaries/messageQueue.o -o Binaries/$(EXEC_SLAVE) $(LINKER_OPTIONS)
 
 view: $(VIEW_OBJECTS)
-	$(CC) $(VIEW_OBJECTS) Binaries/testLib.o Binaries/messageQueue.o -o Binaries/$(EXEC_VIEW) $(LINKER_OPTIONS)
+	$(CC) $(VIEW_OBJECTS) Binaries/testlib.o Binaries/messageQueue.o -o Binaries/$(EXEC_VIEW) $(LINKER_OPTIONS)
 
 binaries_setup:
 	if [ -d "Binaries" ]; then echo "Binaries directory found, proceeding..."; else mkdir Binaries; fi
