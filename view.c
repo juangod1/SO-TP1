@@ -45,10 +45,8 @@ int main(int argc, char ** argv)
     exit(-1);
   }
 
-  //Uncomment after testing and erase connectionId 1234
-  //char * parameter = argv[1];
-  //int connectionId = convertParameterStringToInt(parameter);
-  int connectionId = 1234;
+  char * parameter = argv[1];
+  int connectionId = convertParameterStringToInt(parameter);
   char * readingAddress;
   //Starting buffer connection
   readingAddress = createConnectionWithSharedMemory(connectionId);
@@ -61,22 +59,22 @@ int main(int argc, char ** argv)
   // testPrintAfterChange();
 
   //Connect to master
-  *((char *)readingAddress) = GREEN; // First byte of buffer
+  *((char *)readingAddress+1) = GREEN; // First byte of buffer
   int visualIsConnected = GREEN;
 
   printf("Now testing bufferConnection\n");
   while(visualIsConnected){
 
-        visualIsConnected = *((char *)readingAddress); // First byte of buffer
-        int semaphoreState = *((char *)readingAddress+1); // Second byte of buffer
+        visualIsConnected = *((char *)readingAddress+1); // First byte of buffer
+        int semaphoreState = *((char *)readingAddress+2); // Second byte of buffer
 
         switch(semaphoreState){
             case GREEN:
-                printf("Received message: %s\n",readingAddress+2);
-                *((char *)readingAddress+1) = RED;
+                printf("Received message: %s\n",readingAddress+3);
+                *((char *)readingAddress+2) = RED;
                 break;
             case RED:
-                 while(!(*((char *)readingAddress+1)) && (*((char *)readingAddress)));
+                 while(!(*((char *)readingAddress+2)) && (*((char *)readingAddress+1)));
                 break;
             default:
                 perror("Illegal semaphore state ERROR");
@@ -141,14 +139,20 @@ char * createConnectionWithSharedMemory(key_t key){
   if((connectionId = shmget(key, BUFFER_SIZE, 0666)) < 0)
   {
     perror("Failed to locate shared memory.\n");
-    exit(1);
+    exit(-1);
   }
 
   //Attempting to create a connection with data space
   if((readingAddress = shmat(connectionId, 0, 0)) == (char*) -1)
   {
     perror("Failed to connect with data space.\n");
-    exit(1);
+    exit(-1);
+  }
+
+  //Checking safety code
+  if(*readingAddress != 100){
+    perror("Connection with unknown source");
+    exit(-1);
   }
   return readingAddress;
 }

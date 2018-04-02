@@ -88,21 +88,20 @@ void run(int argc, const char ** argv, int testMode){
     createSlaves(numberOfFiles,testMode);
 
     //Process cycle
-    *((char *)bufferAddress) = RED;
+    *((char *)bufferAddress) = 100; //Safety code
     *((char *)bufferAddress+1) = RED;
+    *((char *)bufferAddress+2) = RED;
     //Wait 10 seconds to be able to run view
     sleep(10);
 
     while(hashCount != (numberOfFiles)){
         //This two variables can be moved to the beginning of "run".
-        int visualIsConnected = *((char *)bufferAddress); // First byte of buffer
-        int semaphoreState = *((char *)bufferAddress+1); // Second byte of buffer
         char hashBuffer[HASH_SIZE+1] = {0};
 
-        switch(semaphoreState)
+        switch(*((char *)bufferAddress+2))
         {
             case RED:
-                cleanBuffer(bufferAddress,BUFFER_SIZE);//This clean might 
+                cleanBuffer(bufferAddress,BUFFER_SIZE); 
                 if(isEmpty(HASHQ_ID)){
                   //printf("Queue is empty.... waiting\n");
                   break;
@@ -110,18 +109,18 @@ void run(int argc, const char ** argv, int testMode){
                 if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
                     hashCount++;
                 printf("Received message: %s\n",hashBuffer);
-                memcpy(bufferAddress+2,hashBuffer,HASH_SIZE);
+                memcpy(bufferAddress+3,hashBuffer,HASH_SIZE);
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"file hash: %s \n",hashBuffer);
                 // TODO: write hash to file on disc
-                *((char *)bufferAddress+1) = GREEN;
+                *((char *)bufferAddress+2) = GREEN;
                 break;
             case GREEN:
-                if(visualIsConnected){
-                    while(*((char *)bufferAddress+1));
+                if(*((char *)bufferAddress+1)){
+                    while(*((char *)bufferAddress+2));
                 }
                 else
-                    *((char *)bufferAddress+1) = RED;
+                    *((char *)bufferAddress+2) = RED;
                 break;
             default:
                 perror("Illegal semaphore state ERROR");
@@ -130,11 +129,11 @@ void run(int argc, const char ** argv, int testMode){
     }
     fclose(fileToWrite);
     //Wait 2 seconds in case view did not finish printing and then disconnect
-    if(*((char *)bufferAddress)){
+    if(*((char *)bufferAddress+1)){
         sleep(2);
-        *((char *)bufferAddress) = RED;
+        *((char *)bufferAddress+1) = RED;
     }
-    void cleanBufferConnections(key_t key);
+    cleanBufferConnections(uniqueKeyPid);
 }
 
 void  createSlaves(int numberOfFiles, int testMode)
@@ -245,7 +244,7 @@ int slaveNumberCalculator(int numberOfFiles)
 
 void cleanBuffer(void * buff, int buffSize){
     //Starts cleaning after the to semaphores
-    for(int i=2; i<buffSize ; i++)
+    for(int i=3; i<buffSize ; i++)
         *((char*)buff+i)=0;
 }
 int is_regular_file(const char *path)
