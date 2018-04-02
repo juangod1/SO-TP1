@@ -37,7 +37,7 @@ void cleanBufferConnections(key_t key);
 void testBufferAlternate();
 
 void run(int argc, const char ** argv, int testMode){
-    //BufferAdress for shared memory 
+    //BufferAdress for shared memory
     char * bufferAddress;
 
     //Uncomment when testing ends
@@ -45,7 +45,7 @@ void run(int argc, const char ** argv, int testMode){
     //key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
     cleanBufferConnections(uniqueKeyPid);
     createBufferConnection(uniqueKeyPid, &bufferAddress);
-    
+
     int queueIDs[2]={0};
 
     if(testMode)
@@ -101,14 +101,13 @@ void run(int argc, const char ** argv, int testMode){
         switch(*((char *)bufferAddress+2))
         {
             case RED:
-                cleanBuffer(bufferAddress,BUFFER_SIZE); 
+                cleanBuffer(bufferAddress,BUFFER_SIZE);
                 if(isEmpty(HASHQ_ID)){
                   //printf("Queue is empty.... waiting\n");
                   break;
                 }
                 if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
                     hashCount++;
-                printf("Received message: %s\n",hashBuffer);
                 memcpy(bufferAddress+3,hashBuffer,HASH_SIZE);
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"file hash: %s \n",hashBuffer);

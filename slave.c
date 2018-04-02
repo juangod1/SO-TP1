@@ -48,7 +48,6 @@ int main(int argc, const char ** argv)
     }
 
     getMessage(fileQueueDescriptor, MAX_PATH_LEN, path);
-      printf("path: %s\n",path);
     if(path==NULL)
     {
       printf("Null message\n");

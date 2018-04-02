@@ -40,7 +40,8 @@ void printSemaphores(char * address);
 int main(int argc, char ** argv)
 {
   //If more than 1 argument, abort.
-  if(argc != 2){ //Argument 0 is the program name.
+  if(argc != 2)
+  { //Argument 0 is the program name.
     perror("Error: One and only argument must be provided.\nExiting program...\n");
     exit(-1);
   }
@@ -63,12 +64,14 @@ int main(int argc, char ** argv)
   int visualIsConnected = GREEN;
 
   printf("Now testing bufferConnection\n");
-  while(visualIsConnected){
+  while(visualIsConnected)
+  {
 
         visualIsConnected = *((char *)readingAddress+1); // First byte of buffer
         int semaphoreState = *((char *)readingAddress+2); // Second byte of buffer
 
-        switch(semaphoreState){
+        switch(semaphoreState)
+        {
             case GREEN:
                 printf("Received message: %s\n",readingAddress+3);
                 *((char *)readingAddress+2) = RED;
@@ -107,11 +110,13 @@ void testPrintArgumentToTerminal()
   thenSuccess();
 }
 
-void givenAString(){
+void givenAString()
+{
   setString("String");
 }
 
-void givenAChange(){
+void givenAChange()
+{
   setString("Change");
 }
 
@@ -132,7 +137,8 @@ int convertParameterStringToInt(char * param)
   return atoi(param);
 }
 
-char * createConnectionWithSharedMemory(key_t key){
+char * createConnectionWithSharedMemory(key_t key)
+{
   int connectionId;
   char * readingAddress;
   //Attempting to locate the shared memory
@@ -150,7 +156,8 @@ char * createConnectionWithSharedMemory(key_t key){
   }
 
   //Checking safety code
-  if(*readingAddress != 100){
+  if(*readingAddress != 100)
+  {
     perror("Connection with unknown source");
     exit(-1);
   }
@@ -160,9 +167,9 @@ char * createConnectionWithSharedMemory(key_t key){
 void testBufferConnection(key_t key)
 {
   createConnectionWithSharedMemory(key);
-  //printf("Este es el dato que recibo en el buffer --> %s\n", readingAddress);
 }
 
-void printSemaphores(char * address){
+void printSemaphores(char * address)
+{
   printf("Visual:%d, Semaphore:%d\n",(char)*((char *)address),(char)*((char *)address+1));
 }
