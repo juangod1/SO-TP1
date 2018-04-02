@@ -40,9 +40,7 @@ void run(int argc, const char ** argv, int testMode){
     //BufferAdress for shared memory
     char * bufferAddress;
 
-    //Uncomment when testing ends
-    key_t uniqueKeyPid = 1234;
-    //key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
+    key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
     cleanBufferConnections(uniqueKeyPid);
     createBufferConnection(uniqueKeyPid, &bufferAddress);
 
@@ -142,7 +140,7 @@ void run(int argc, const char ** argv, int testMode){
         sem_post(semSem);
     }
 
-    //Close connections 
+    //Close connections
     cleanBufferConnections(uniqueKeyPid);
     closeSemaphores(&visSem, &semSem);
 }

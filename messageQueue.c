@@ -61,13 +61,11 @@ int sendMessage(const char * msg, size_t msgLen,mqd_t queueDescriptor)
 
 void closeHashQueue(){
     if(mq_unlink("/hashQueue")==-1);
-        perror("no /hashQueue previously left open... (mq_unlink) ");
 }
 
 void closeFileQueue()
 {
     if(mq_unlink("/fileQueue")==-1);
-        perror("no /fileQueue previously left open... (mq_unlink) ");
 }
 
 int isEmpty(mqd_t queueID)
