@@ -69,7 +69,7 @@ void run(int argc, const char ** argv, int testMode){
 
     // Creates shared memory buffer for view process and message queues for slave processes
     createMasterQueues(numberOfFiles,queueIDs);
-
+    int numberOfFilesCopy=numberOfFiles;
     // Queue files for slaves to poll
     for(int i=0; i<numberOfFiles; i++)
     {
@@ -80,9 +80,10 @@ void run(int argc, const char ** argv, int testMode){
         else
         {
           printf("%s Ignored. Not a regular file\n",argv[i+parametersOffset]);
-          numberOfFiles--;
+          numberOfFilesCopy--;
         }
     }
+    numberOfFiles=numberOfFilesCopy;
 
     // Launch slave processes
     createSlaves(numberOfFiles,testMode);
@@ -94,7 +95,7 @@ void run(int argc, const char ** argv, int testMode){
     //Wait 10 seconds to be able to run view
     sleep(10);
 
-    while(hashCount < (numberOfFiles)){
+    while(hashCount < numberOfFiles){
         //This two variables can be moved to the beginning of "run".
         char hashBuffer[HASH_SIZE+1] = {0};
 
@@ -103,11 +104,13 @@ void run(int argc, const char ** argv, int testMode){
             case RED:
                 cleanBuffer(bufferAddress,BUFFER_SIZE);
                 if(isEmpty(HASHQ_ID)){
-                  //printf("Queue is empty.... waiting\n");
+                  //printf("Queue is empty.... waiting hashCount: %d. numberOfFiles: %d\n",hashCount,numberOfFiles);
                   break;
                 }
-                if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0)
-                    hashCount++;
+                if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0){
+                  //printf("Removed one element hashCount: %d. numberOfFiles: %d\n",hashCount,numberOfFiles);
+                  hashCount++;
+                }
                 memcpy(bufferAddress+3,hashBuffer,HASH_SIZE);
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"file hash: %s \n",hashBuffer);
