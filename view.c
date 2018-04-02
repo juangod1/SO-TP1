@@ -73,7 +73,7 @@ int main(int argc, char ** argv)
         switch(semaphoreState)
         {
             case GREEN:
-                printf("Received message: %s\n",readingAddress+3);
+                printf("%s\n",readingAddress+3);
                 *((char *)readingAddress+2) = RED;
                 break;
             case RED:

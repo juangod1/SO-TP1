@@ -97,7 +97,7 @@ void run(int argc, const char ** argv, int testMode){
 
     while(hashCount < numberOfFiles){
         //This two variables can be moved to the beginning of "run".
-        char hashBuffer[HASH_SIZE+1] = {0};
+        char hashBuffer[PATH_MAX+HASH_SIZE+1] = {0};
 
         switch(*((char *)bufferAddress+2))
         {
@@ -107,13 +107,12 @@ void run(int argc, const char ** argv, int testMode){
                   //printf("Queue is empty.... waiting hashCount: %d. numberOfFiles: %d\n",hashCount,numberOfFiles);
                   break;
                 }
-                if (getMessage(HASHQ_ID,HASH_SIZE,hashBuffer)>0){
-                  //printf("Removed one element hashCount: %d. numberOfFiles: %d\n",hashCount,numberOfFiles);
-                  hashCount++;
+                if (getMessage(HASHQ_ID,HASH_SIZE+PATH_MAX,hashBuffer)>0){
+                    hashCount++;
                 }
-                memcpy(bufferAddress+3,hashBuffer,HASH_SIZE);
+                memcpy(bufferAddress+3,hashBuffer,HASH_SIZE+PATH_MAX);
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
-                fprintf(fileToWrite,"file hash: %s \n",hashBuffer);
+                fprintf(fileToWrite,"%s\n",hashBuffer);
                 // TODO: write hash to file on disc
                 *((char *)bufferAddress+2) = GREEN;
                 break;
@@ -240,7 +239,7 @@ int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray)
     closeHashQueue();
 
     fileQueue = createQueue("/fileQueue",PATH_MAX,numberOfFiles,O_NONBLOCK);
-    hashQueue = createQueue("/hashQueue",HASH_SIZE,numberOfFiles,0);
+    hashQueue = createQueue("/hashQueue",PATH_MAX+HASH_SIZE,numberOfFiles,0);
 
     queueDescriptorArray[0] = fileQueue;
     queueDescriptorArray[1] = hashQueue;

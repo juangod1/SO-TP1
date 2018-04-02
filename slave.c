@@ -27,7 +27,7 @@ int main(int argc, const char ** argv)
   long isTest = strtol(argv[2],NULL,BASE10);
 
   fileQueueDescriptor = createQueue("/fileQueue",MAX_PATH_LEN,numberOfFiles,O_NONBLOCK);
-  hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE,numberOfFiles,0);
+  hashQueueDescriptor = createQueue("/hashQueue",HASH_SIZE+MAX_PATH_LEN,numberOfFiles,0);
 
   if(isTest)
   {
@@ -37,7 +37,7 @@ int main(int argc, const char ** argv)
   }
 
   char path[MAX_PATH_LEN];
-  char buffer[MD5_LEN];
+  char buffer[MD5_LEN + MAX_PATH_LEN];
 
   while(!isEmpty(fileQueueDescriptor))
   {
@@ -55,7 +55,7 @@ int main(int argc, const char ** argv)
     else
     {
       readMD5(path,buffer);
-      sendMessage(buffer, HASH_SIZE, hashQueueDescriptor);
+      sendMessage(buffer, MAX_PATH_LEN+HASH_SIZE, hashQueueDescriptor);
     }
   }
     exit(0);
@@ -82,6 +82,12 @@ int readMD5(const char* path, char* buffer)
     return -1;
   }
   int i; char ch;
+  for (i = 1; i < MAX_PATH_LEN && path[i] != '\0'; i++)
+  {
+    *(buffer++) = path[i];
+  }
+  *(buffer++) = ':';
+  *(buffer++) = ' ';
   for (i = 0; i < MD5_LEN; i++)
   {
     ch = fgetc(p);
