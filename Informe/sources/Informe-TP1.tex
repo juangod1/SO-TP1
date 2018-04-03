@@ -59,14 +59,13 @@ El sistema se basa en tres programas, el programa maestro, el programa esclavo y
 \section{IPCs}
 \subsection{Message Queue}
 	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento FIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro.
-\subsection{Señales} 
-Con respecto a los metodos de intercomunicacion de procesos para respetar sus “turnos” de actividad sobre la memoria compartida, optamos por dejar 3 bytes delante del buffer compartido designados para Safety code, Visual semaphore y Status semaphore, respectivamente. 
-Safety code es un char con valor determinado por el master, esto nos permite verificar que la aplicacion view no logro conectarse a un espacio de memoria compartida incorrecto desde el comienzo de su ejecucion. 
-El segundo es un semaforo que informa si el proceso view esta corriendo, es iniciado por defecto en 0 y luego cuando se conecta la view, se cambia a 1. Para finalizar de forma correcta ambas aplicaciones, el master vuelve a desconectar a la view poniendo en 0 este semaforo.
-El tercer byte es otro semaforo que informa el turno de cada proceso. A partir de esto, los procesos view y master pueden evitar pisarse el uno al otro. 
+\subsection{Semáforos} 
+Con respecto a los métodos de intercomunicación de procesos para respetar sus “turnos” de actividad sobre la memoria compartida, optamos por dejar 3 bytes delante del buffer denominados Safety Code, Visual Semaphore y Status Semaphore, respectivamente. 
+Safety Code tiene un valor determinado por el proceso maestro, esto nos permite verificar que la aplicacion vista no conecte a un espacio de memoria compartida incorrecto desde el comienzo de su ejecucion. 
+Visual Semaphore es un semáforo que informa si el proceso vista está corriendo, es iniciado por defecto en 0 y cuando se conecta la aplicación, se cambia a 1. Para finalizar de forma correcta ambas aplicaciones, el proceso maestro desconecta a la aplicación vista poniendo en 0 este semáforo.
+Por último, Status Semaphore es un indicador del turno de cada proceso, 0 para el proceso maestro y 1 para el proceso vista. A partir de esto, los procesos maestro y vista evitan colisiones entre ellas. 
 
-Para evitar el uso de “busy waiting” decidimos utilizar la libreria de semaphores de postix. Decidimos hacer un hibrido entre los bytes reservados y los semaphores del API posix. Guardamos los valores dentro de los bytes reservados pero utilizabamos los semaphores para blockear o liberar los procesos cuando necesitaban manejar una espera. Se utilizaron en total 2 semaphores.
-Este hibrido fue implementado debido a problemas encontrados con la API posix de semaphores, para ver mas por favor remitirse al capitulo 3 \emph{problemas y soluciones} bajo la seccion \emph{Proceso Vista} subseccion \emph{problema de espera activa}
+Para evitar el \textit{busy waiting} utilizamos la librería de semáforos de POSIX. Decidimos hacer un híbrido entre los bytes reservados y los semaphores del API de POSIX. Guardamos los valores dentro de los bytes reservados y utilizamos los semáforos POSIX para bloquear o liberar los procesos cuando necesitan manejar una espera. Este híbrido fue implementado debido a problemas encontrados en la API de POSIX de semáforos. \textit{Léase: Sección 3.1.1}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Utilización}
@@ -104,8 +103,6 @@ ssss
 \emph{WIP}
 
 	Con esta libreria inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la funcion sem\_getvalue, la cual nos presento problemas en su ejecucion dentro del ciclo principal del master.  Siempre que la funcion era llamada dentro del ciclo, se generaba un segmentation fault. Debido a esto tuvimos que manejarnos sin ver los valores del semaphore por lo que finalmente decidimos hacer un hibrido entre los bytes reservados y los semaphores del API.
-asdfadsf
-Dummy text
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
