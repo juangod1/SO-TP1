@@ -5,10 +5,20 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
+#include <ctype.h>
+
 #include "testSlave.h"
 #include "testlib.h"
 #include "../slave.h"
 #include "../messageQueue.h"
+
+void testMD5Hashing();
+
+void givenExistingFile();
+
+void whenCalculatingHash();
+
+void thenReturnValueIsNotNull();
 
 char testPath[MAX_PATH_LEN];
 char buffer[MD5_LEN];
@@ -16,61 +26,42 @@ char testBuffer[MAX_PATH_LEN];
 
 int testRun(mqd_t fileQueueDescriptor, mqd_t hashQueueDescriptor)
 {
-    testExistingFilePrint();
+    printf("Test MD5 Hashing:");
+    testMD5Hashing();
+    printf("Test getting item from file queue:");
     testGettingItemFromFileQueue(fileQueueDescriptor);
     return 0;
 }
+//TODO: esto es testeo de posix?
+// void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor)
+// {
+//   givenAnExistingTestMessage();
+//   whenReadingQueueDescriptor(fileQueueDescriptor);
+//   thenFoundMessage();
+// }
 
-void testGettingItemFromFileQueue(mqd_t fileQueueDescriptor)
-{
-  printf("Testing getting an existing item from the queue...\n");
-  printf("Amount of elements in queue: %ld\n", numberOfMessages(fileQueueDescriptor));
-  givenAnExistingTestMessage();
-  whenReadingQueueDescriptor(fileQueueDescriptor);
-  thenFoundMessage();
-}
+// void   givenAnExistingTestMessage()
+// {
 
-void   givenAnExistingTestMessage()
-{
-}
+// }
 
-void whenReadingQueueDescriptor(mqd_t fileQueueDescriptor)
-{
-    getMessage(fileQueueDescriptor, MAX_PATH_LEN, testBuffer);
-}
+// void whenReadingQueueDescriptor(mqd_t fileQueueDescriptor)
+// {
+//     getMessage(fileQueueDescriptor, MAX_PATH_LEN, testBuffer);
+// }
 
-void thenFoundMessage()
-{
-  if(strcmp(testBuffer,"test")==0)
-  {
-    ok();
-  }
-  else
-  {
-    char errormsg[50]={0};
-    sprintf(errormsg,"Expected: \"test\" found %s: \n", testBuffer);
-    fail(errormsg);
-  }
-}
+// void thenFoundMessage()
+// {
+//   checkStringsEqual(testBuffer, "test");
+// }
 
-void testExistingFilePrint()
+//TODO: agregar al informe que esto es meritorio
+//por que esta nuestra funcion en el medio.
+void testMD5Hashing()
 {
-  printf("Testing Existing File Print...  \n");
   givenExistingFile();
-
-  whenExecuting(buffer);
-
-  thenValueIsNotNull(buffer);
-}
-
-void thenValueIsNotNull(char *buffer)
-{
-  if(buffer!=NULL){
-    printf("%s\n",buffer);
-    ok();
-    return;
-  }
-  fail("Value is null");
+  whenCalculatingHash();
+  thenReturnValueIsNotNull();
 }
 
 void givenExistingFile()
@@ -78,7 +69,12 @@ void givenExistingFile()
   sprintf(testPath, "messageQueue.c");
 }
 
-void whenExecuting(char * buffer)
+void thenReturnValueIsNotNull()
+{
+  checkIsNotNull(buffer);
+}
+
+void whenCalculatingHash()
 {
   readMD5(testPath, buffer);
 }
