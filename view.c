@@ -38,6 +38,7 @@ int main(int argc, char ** argv)
   char * parameter = argv[1];
   int connectionId = convertParameterStringToInt(parameter);
   char * readingAddress;
+
   //Starting buffer connection
   readingAddress = createConnectionWithSharedMemory(connectionId);
 
@@ -46,18 +47,19 @@ int main(int argc, char ** argv)
   openSemaphores(&visSem,&semSem);
 
   //Connect to master
-  *((char *)readingAddress+1) = GREEN; // Second byte of buffer
+  VIEW_IS_CONNECTED_BYTE = GREEN; // Second byte of buffer
 
   printf("This is the view for the hashing process with PID: %d\n", connectionId);
-  while(*((char *)readingAddress+1))
+
+  while(VIEW_IS_CONNECTED_BYTE)
   {
-    int semaphoreState = *((char *)readingAddress+2); // Third byte of buffer
+    int semaphoreState = PROCESS_TURN_SEMAPHORE_BYTE; // Third byte of buffer
 
     switch(semaphoreState)
     {
         case GREEN:
             printf("%s\n",readingAddress+3);
-            *((char *)readingAddress+2) = RED;
+            PROCESS_TURN_SEMAPHORE_BYTE = RED;
             sem_post(visSem);
             break;
         case RED:

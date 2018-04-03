@@ -8,6 +8,8 @@
 #define BUFFER_SIZE (HASH_SIZE + FILENAME_MAX)
 #define GREEN 1
 #define RED 0
+#define VIEW_IS_CONNECTED_BYTE *((char *)readingAddress+1)
+#define PROCESS_TURN_SEMAPHORE_BYTE *((char *)readingAddress+2)
 
 int convertParameterStringToInt(char * param);
 char * createConnectionWithSharedMemory(key_t key);
