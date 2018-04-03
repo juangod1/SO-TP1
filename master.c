@@ -46,15 +46,7 @@ void run(int argc, const char ** argv, int mode)
     int queueIDs[2]={0};
     if(mode==TEST) //test mode
     {
-      int * status=malloc(4); pid_t wpid;
-      createTestBuffer();
-      createTestQueue(queueIDs);
-      createTestSlave();
-      while ((wpid = wait(status)) > 0); //wait for all child processes
-      fflush(stdout);
-      closeFileQueue();
-      closeHashQueue();
-      free(status);
+      testModeRun(queueIDs);
       exit(1);
     }
 
@@ -78,10 +70,7 @@ void run(int argc, const char ** argv, int mode)
 
     createSlaves(numberOfFiles,0);
 
-    //Process cycle
-    *((char *)bufferAddress) = 100; //Safety code
-    VIEW_IS_CONNECTED_BYTE = RED;
-    PROCESS_TURN_SEMAPHORE_BYTE = RED;
+    semaphoreInitiation(bufferAddress);
 
     if(mode==WAIT){
       waitForViewSystem(uniqueKeyPid, bufferAddress);
@@ -103,7 +92,6 @@ void run(int argc, const char ** argv, int mode)
                     hashCount++;
                 }
                 memcpy(bufferAddress+3,hashBuffer,HASH_SIZE+PATH_MAX);
-                //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"%s\n",hashBuffer);
                 PROCESS_TURN_SEMAPHORE_BYTE = GREEN;
                 sem_post(semSem);
@@ -123,18 +111,41 @@ void run(int argc, const char ** argv, int mode)
     fclose(fileToWrite);
     printf("Hashes written to \'HashDump/hashDump.txt\'\n");
 
-    //closeProgramConnections();
-    //Disconnect the visual process
-    if(VIEW_IS_CONNECTED_BYTE)
-    {
-        *((char *)bufferAddress+1) = RED;
-        *((char *)bufferAddress+2) = RED;
-        sem_post(semSem);
-    }
+    closeProgramConnections(semSem, visSem, uniqueKeyPid, bufferAddress);
 
-    //Close connections
-    cleanBufferConnections(uniqueKeyPid);
-    closeSemaphores(&visSem, &semSem);
+}
+
+void semaphoreInitiation(char * bufferAddress)
+{
+  *((char *)bufferAddress) = 100; //Safety code
+  VIEW_IS_CONNECTED_BYTE = RED;
+  PROCESS_TURN_SEMAPHORE_BYTE = RED;
+}
+
+
+void closeProgramConnections(sem_t * semSem, sem_t * visSem, key_t uniqueKeyPid, char* bufferAddress)
+{
+  if(VIEW_IS_CONNECTED_BYTE)
+  {
+      *((char *)bufferAddress+1) = RED;
+      *((char *)bufferAddress+2) = RED;
+      sem_post(semSem);
+  }
+  cleanBufferConnections(uniqueKeyPid);
+  closeSemaphores(&visSem, &semSem);
+}
+
+void testModeRun(int * queueIDs)
+{
+  int * status=malloc(4); pid_t wpid;
+  createTestBuffer();
+  createTestQueue(queueIDs);
+  createTestSlave();
+  while ((wpid = wait(status)) > 0); //wait for all child processes
+  fflush(stdout);
+  closeFileQueue();
+  closeHashQueue();
+  free(status);
 }
 
 int sendFilesToQueue(int numberOfFiles, const char** argv, int argc, int parametersOffset, int *queueIDs)
@@ -243,7 +254,7 @@ void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPo
 void waitForViewSystem(key_t uniqueKeyPid, char * bufferAddress)
 {
   printf("Waiting for connection with semaphore system. PID: %d\n", uniqueKeyPid);
-  for (int i=0; i<100 && VIEW_IS_CONNECTED_BYTE==0; i++)
+  for (int i=0; i<60 && VIEW_IS_CONNECTED_BYTE==0; i++)
   {
     if(i%20==0){
       putchar('\n');
@@ -253,12 +264,13 @@ void waitForViewSystem(key_t uniqueKeyPid, char * bufferAddress)
     fflush(stdout);
 
   }
-  if(VIEW_IS_CONNECTED_BYTE){
-    putchar('\n');
-    putchar('\n');
-  }
-  else{
-    printf("Connection timedout. Exiting program...");
+
+  putchar('\n');
+  putchar('\n');
+
+  if(!VIEW_IS_CONNECTED_BYTE)
+  {
+    printf("Connection timedout.\nExiting program...\n");
     exit(-1);
   }
 }
