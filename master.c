@@ -30,7 +30,7 @@
 int connectionId;
 
 
-void run(int argc, const char ** argv, int testMode)
+void run(int argc, const char ** argv, int mode)
 {
     //BufferAdress for shared memory
     char * bufferAddress;
@@ -44,8 +44,7 @@ void run(int argc, const char ** argv, int testMode)
     openSemaphores(&visSem,&semSem);
 
     int queueIDs[2]={0};
-
-    if(testMode)
+    if(mode==2) //test mode
     {
       int * status=malloc(4); pid_t wpid;
       createTestBuffer();
@@ -59,7 +58,7 @@ void run(int argc, const char ** argv, int testMode)
       exit(1);
     }
 
-    int parametersOffset = (testMode ? 2 : 1 );// Due to testing flag existing or not existing
+    int parametersOffset = ((mode==1) ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
     FILE *fileToWrite;
@@ -69,29 +68,40 @@ void run(int argc, const char ** argv, int testMode)
     createMasterQueues(numberOfFiles,queueIDs);
     int numberOfFilesCopy=numberOfFiles;
     // Queue files for slaves to poll
-    for(int i=0; i<numberOfFiles; i++)
+    for(int i=parametersOffset; i<argc; i++)
     {
-        if(is_regular_file(argv[i+parametersOffset]))
+        if(is_regular_file(argv[i]))
         {
-          sendMessage(argv[i+parametersOffset], strlen(argv[i+parametersOffset]), FILEQ_ID);
+          sendMessage(argv[i], strlen(argv[i]), FILEQ_ID);
         }
         else
         {
-          printf("%s Ignored. Not a regular file\n",argv[i+parametersOffset]);
+          printf("%s Ignored. Not a regular file\n",argv[i]);
           numberOfFilesCopy--;
         }
     }
     numberOfFiles=numberOfFilesCopy;
-
     // Launch slave processes
-    createSlaves(numberOfFiles,testMode);
+    createSlaves(numberOfFiles,0);
 
     //Process cycle
     *((char *)bufferAddress) = 100; //Safety code
     *((char *)bufferAddress+1) = RED;
     *((char *)bufferAddress+2) = RED;
-    //Wait 10 seconds to be able to run view
-    sleep(10);
+
+    putchar('\n');
+
+    if(mode==1){
+      printf("Waiting for connection with semaphore system. PID: %d\n", uniqueKeyPid);
+      for (int i=0; i<10; i++)
+      {
+        sleep(1);
+        putchar('.');
+        fflush(stdout);
+      }
+      putchar('\n');
+      putchar('\n');
+    }
 
     while(hashCount < numberOfFiles)
     {
@@ -127,6 +137,7 @@ void run(int argc, const char ** argv, int testMode)
         }
     }
     fclose(fileToWrite);
+    printf("Hashs written to Hashdump file\n");
 
     //Disconnect the visual process
     if(*((char *)bufferAddress+1))
