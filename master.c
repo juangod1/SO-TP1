@@ -76,11 +76,21 @@ void run(int argc, const char ** argv, int mode)
         }
         else
         {
-          printf("%s Ignored. Not a regular file\n",argv[i]);
+          printf("\'%s\' Ignored. Not a regular file\n",argv[i]);
           numberOfFilesCopy--;
         }
     }
     numberOfFiles=numberOfFilesCopy;
+
+    putchar('\n');
+
+    if(numberOfFiles<=0)
+    {
+        printf("Error: no programs are hashable\nExiting program...\n");
+        exit(-1);
+    }
+
+
     // Launch slave processes
     createSlaves(numberOfFiles,0);
 
@@ -89,9 +99,7 @@ void run(int argc, const char ** argv, int mode)
     VIEW_IS_CONNECTED_BYTE = RED;
     PROCESS_TURN_SEMAPHORE_BYTE = RED;
 
-    putchar('\n');
-
-    if(mode==1){
+    if(mode==1 ){
       printf("Waiting for connection with semaphore system. PID: %d\n", uniqueKeyPid);
       for (int i=0; i<10; i++)
       {
@@ -137,7 +145,7 @@ void run(int argc, const char ** argv, int mode)
         }
     }
     fclose(fileToWrite);
-    printf("Hashes written to HashDump/hashDump.txt\n");
+    printf("Hashes written to \'HashDump/hashDump.txt\'\n");
 
     //Disconnect the visual process
     if(VIEW_IS_CONNECTED_BYTE)
