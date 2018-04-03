@@ -8,16 +8,26 @@ int main(int argc, const char ** argv)
 {
     if(argc==1) // Argument zero is the program name
     {
-        perror("Error: 0 program arguments received.\nExiting program...\n");
+        printf("Error: 0 program arguments received.\nExiting program...\n");
         exit(-1);
     }
-    if(argc == 2 && strcmp(argv[1], "-t")==0) //test Mode check
+    if(strcmp(argv[1], "-t")==0) //test Mode check
     {
+      if(argc!=2)
+      {
+        printf("Error: Test mode cannot recieve arguments\nExiting program...\n");
+        exit(-1);
+      }
       printf("\n_____________________________\n\n.....Entering test mode.....\n\n_____________________________\n\n");
       run(argc,argv,2);
     }
     if(strcmp(argv[1], "-w")==0)
     {
+      if(argc<3)
+      {
+          printf("Error: 0 program arguments received.\nExiting program...\n");
+          exit(-1);
+      }
       printf("\nCommencing hashing in wait mode\n\n");
       run(argc,argv,1);
     }

@@ -17,7 +17,7 @@ mqd_t createQueue(const char* mqName, long messageSize, long maxMessages, long m
 {
     if(maxMessages>readSystemMaxMsg())
     {
-      printf("\n________________________________\n\nUnable to complete operation: Your\nmax_msg system variable (%d) is smaller\nthan number of files sent (%ld).\nYou can modify this value in /proc/sys/fs/mqueue/msg_max\nExiting the program...\n_________________________________\n\n",readSystemMaxMsg(),maxMessages);
+      printf("\n_______________________________________________________\n\nUnable to complete operation:\nYour max_msg system variable (%d);\nis smaller than the number of files sent (%ld).\nYou can modify this value in /proc/sys/fs/mqueue/msg_max\nExiting the program...\n_______________________________________________________\n\n",readSystemMaxMsg(),maxMessages);
         exit(-1);
     }
 
