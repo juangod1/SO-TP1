@@ -4,20 +4,22 @@
 \contentsline {section}{\numberline {1.2}IPCs}{2}
 \contentsline {subsection}{\numberline {1.2.1}Message Queue}{2}
 \contentsline {subsection}{\numberline {1.2.2}Se\IeC {\~n}ales}{2}
-\contentsline {chapter}{\numberline {2}Utilizaci\IeC {\'o}n}{3}
-\contentsline {section}{\numberline {2.1}Compilaci\IeC {\'o}n y Ejecuci\IeC {\'o}n}{3}
-\contentsline {section}{\numberline {2.2}Proceso Vista}{3}
-\contentsline {chapter}{\numberline {3}Problemas y Resoluciones}{4}
-\contentsline {section}{\numberline {3.1}Proceso Maestro}{4}
-\contentsline {subsection}{\numberline {3.1.1}Problema de espera activo}{4}
-\contentsline {subsection}{\numberline {3.1.2}\textit {Hasheo} de archivos}{4}
-\contentsline {section}{\numberline {3.2}Proceso Esclavo}{4}
-\contentsline {section}{\numberline {3.3}Proceso Vista}{4}
-\contentsline {chapter}{\numberline {4}Testing}{5}
-\contentsline {section}{\numberline {4.1}Sistema de Testing}{5}
-\contentsline {section}{\numberline {4.2}Fugas de Memoria}{5}
-\contentsline {chapter}{\numberline {5}Limitaciones}{7}
-\contentsline {section}{\numberline {5.1}Limitaciones del Sistema}{7}
-\contentsline {section}{\numberline {5.2}Limitaciones de la Implementaci\IeC {\'o}n}{7}
-\contentsline {chapter}{\numberline {6}Bibliograf\IeC {\'\i }a}{8}
-\contentsline {section}{\numberline {6.1}Extractos de c\IeC {\'o}digo}{8}
+\contentsline {chapter}{\numberline {2}Utilizaci\IeC {\'o}n}{4}
+\contentsline {section}{\numberline {2.1}Compilaci\IeC {\'o}n y Ejecuci\IeC {\'o}n}{4}
+\contentsline {section}{\numberline {2.2}Proceso Vista}{4}
+\contentsline {chapter}{\numberline {3}Problemas y Resoluciones}{5}
+\contentsline {section}{\numberline {3.1}Proceso Maestro}{5}
+\contentsline {subsection}{\numberline {3.1.1}Problema de espera activo}{5}
+\contentsline {section}{\numberline {3.2}Proceso Esclavo}{5}
+\contentsline {subsection}{\numberline {3.2.1}\textit {Hasheo} de archivos}{5}
+\contentsline {section}{\numberline {3.3}Proceso Vista}{5}
+\contentsline {subsection}{\numberline {3.3.1}problema de espera activa}{5}
+\contentsline {chapter}{\numberline {4}Testing}{7}
+\contentsline {section}{\numberline {4.1}Sistema de Testing}{7}
+\contentsline {subsection}{\numberline {4.1.1}Filosofia de testeo}{7}
+\contentsline {section}{\numberline {4.2}Fugas de Memoria}{7}
+\contentsline {chapter}{\numberline {5}Limitaciones}{9}
+\contentsline {section}{\numberline {5.1}Limitaciones del Sistema}{9}
+\contentsline {section}{\numberline {5.2}Limitaciones de la Implementaci\IeC {\'o}n}{9}
+\contentsline {chapter}{\numberline {6}Bibliograf\IeC {\'\i }a}{10}
+\contentsline {section}{\numberline {6.1}Extractos de c\IeC {\'o}digo}{10}

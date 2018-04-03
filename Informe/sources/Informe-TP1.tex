@@ -77,6 +77,7 @@ El \textit{make} compila también de manera separada el proceso vista, para ejec
 \section{Proceso Maestro}
 \subsection{Problema de espera activo}
 msq recieve con block asi no hace espera activa sino que el SO lo despierta cuando la queue cambia de empty a nonempty
+\section{Proceso Esclavo}
 \subsection{\textit{Hasheo} de archivos}
 Nos vimos ante la necesidad de utilizar la función de Linux md5sum para conseguir el hash de los archivos. Sin embargo este función
 era únicamente accesible a través de línea de comandos de Linux y no en el entorno de biblioteca de funciones de c. Al no tener las
@@ -85,8 +86,6 @@ herramientas para crear una función propia debimos encontrar otra solución par
 Luego de investigación en Internet se propuso utilizar la función popen() con parámetro cmd que ejecuta un proceso de línea de comandos
 de Linux y a través de él ejecutar la función md5sum con los parámetros correspondientes. Luego la salida de la ejecución de las funciones
 es traída al entorno de la aplicación con la función fgets.
-\section{Proceso Esclavo}
-sdfasdf
 \section{Proceso Vista}
 ssss
 \subsection{problema de espera activa}
