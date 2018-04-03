@@ -20,6 +20,8 @@
 #define IS_NOT_TEST_SLAVE 1
 #define VIEW_IS_CONNECTED_BYTE *((char *)bufferAddress+1)
 #define PROCESS_TURN_SEMAPHORE_BYTE *((char *)bufferAddress+2)
+#define WAIT 1
+#define TEST 2
 
 
 void * createBuffer(size_t size);
@@ -30,6 +32,8 @@ void  createSlaves(int numberOfFiles, int testMode);
 void cleanBuffer(void * buff, int buffSize);
 
 void openSemaphores(sem_t ** semaphoreStatusPointer, sem_t **visualConnectedPointer);
+int sendFilesToQueue(int numberOfFiles, const char** argv, int argc, int parametersOffset, int *queueIDs);
+void waitForViewSystem(key_t uniqueKeyPid, char* bufferAddress);
 void closeSemaphores(sem_t ** visualConnectedPointer, sem_t **semaphoreStatusPointer);
 void fetchSemaphoreValue(sem_t *semaphorePointer, int *semaphoreValue);
 void createBufferConnection(key_t key, char ** asignedBufferAddress);

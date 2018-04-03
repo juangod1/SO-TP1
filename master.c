@@ -44,7 +44,7 @@ void run(int argc, const char ** argv, int mode)
     openSemaphores(&visSem,&semSem);
 
     int queueIDs[2]={0};
-    if(mode==2) //test mode
+    if(mode==TEST) //test mode
     {
       int * status=malloc(4); pid_t wpid;
       createTestBuffer();
@@ -58,29 +58,15 @@ void run(int argc, const char ** argv, int mode)
       exit(1);
     }
 
-    int parametersOffset = ((mode==1) ? 2 : 1 );// Due to testing flag existing or not existing
+    int parametersOffset = ((mode==WAIT) ? 2 : 1 );// Due to testing flag existing or not existing
     int hashCount = 0;
     int numberOfFiles = argc - parametersOffset;
     FILE *fileToWrite;
     fileToWrite =  fopen("HashDump/hashDump.txt","a");
 
-    // Creates shared memory buffer for view process and message queues for slave processes
     createMasterQueues(numberOfFiles,queueIDs);
-    int numberOfFilesCopy=numberOfFiles;
-    // Queue files for slaves to poll
-    for(int i=parametersOffset; i<argc; i++)
-    {
-        if(is_regular_file(argv[i]))
-        {
-          sendMessage(argv[i], strlen(argv[i]), FILEQ_ID);
-        }
-        else
-        {
-          printf("\'%s\' Ignored. Not a regular file\n",argv[i]);
-          numberOfFilesCopy--;
-        }
-    }
-    numberOfFiles=numberOfFilesCopy;
+
+    numberOfFiles=sendFilesToQueue(numberOfFiles,argv,argc,parametersOffset, queueIDs);
 
     putchar('\n');
 
@@ -90,8 +76,6 @@ void run(int argc, const char ** argv, int mode)
         exit(-1);
     }
 
-
-    // Launch slave processes
     createSlaves(numberOfFiles,0);
 
     //Process cycle
@@ -99,16 +83,8 @@ void run(int argc, const char ** argv, int mode)
     VIEW_IS_CONNECTED_BYTE = RED;
     PROCESS_TURN_SEMAPHORE_BYTE = RED;
 
-    if(mode==1 ){
-      printf("Waiting for connection with semaphore system. PID: %d\n", uniqueKeyPid);
-      for (int i=0; i<10; i++)
-      {
-        sleep(1);
-        putchar('.');
-        fflush(stdout);
-      }
-      putchar('\n');
-      putchar('\n');
+    if(mode==WAIT){
+      waitForViewSystem(uniqueKeyPid, bufferAddress);
     }
 
     while(hashCount < numberOfFiles)
@@ -147,6 +123,7 @@ void run(int argc, const char ** argv, int mode)
     fclose(fileToWrite);
     printf("Hashes written to \'HashDump/hashDump.txt\'\n");
 
+    //closeProgramConnections();
     //Disconnect the visual process
     if(VIEW_IS_CONNECTED_BYTE)
     {
@@ -158,6 +135,26 @@ void run(int argc, const char ** argv, int mode)
     //Close connections
     cleanBufferConnections(uniqueKeyPid);
     closeSemaphores(&visSem, &semSem);
+}
+
+int sendFilesToQueue(int numberOfFiles, const char** argv, int argc, int parametersOffset, int *queueIDs)
+{
+  int numberOfFilesCopy=numberOfFiles;
+  // Queue files for slaves to poll
+  for(int i=parametersOffset; i<argc; i++)
+  {
+      if(is_regular_file(argv[i]))
+      {
+        sendMessage(argv[i], strlen(argv[i]), FILEQ_ID);
+      }
+      else
+      {
+        printf("\'%s\' Ignored. Not a regular file\n",argv[i]);
+        numberOfFilesCopy--;
+      }
+  }
+  return numberOfFilesCopy;
+
 }
 
 void  createSlaves(int numberOfFiles, int testMode)
@@ -241,6 +238,29 @@ void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPo
     sem_close(*visualConnectedPointer);
     sem_unlink("/semaphoreStatus");
     sem_close(*semaphoreStatusPointer);
+}
+
+void waitForViewSystem(key_t uniqueKeyPid, char * bufferAddress)
+{
+  printf("Waiting for connection with semaphore system. PID: %d\n", uniqueKeyPid);
+  for (int i=0; i<100 && VIEW_IS_CONNECTED_BYTE==0; i++)
+  {
+    if(i%20==0){
+      putchar('\n');
+    }
+    sleep(1);
+    putchar('.');
+    fflush(stdout);
+
+  }
+  if(VIEW_IS_CONNECTED_BYTE){
+    putchar('\n');
+    putchar('\n');
+  }
+  else{
+    printf("Connection timedout. Exiting program...");
+    exit(-1);
+  }
 }
 
 //Fetch semaphore value and deposit in pointer to int. Checking for error
