@@ -48,7 +48,13 @@ dshfdshfdshfds
 \subsection{Message Queue}
 	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento FIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro.
 \subsection{Señales} 
+Con respecto a los metodos de intercomunicacion de procesos para respetar sus “turnos” de actividad sobre la memoria compartida, optamos por dejar 3 bytes delante del buffer compartido designados para Safety code, Visual semaphore y Status semaphore, respectivamente. 
+Safety code es un char con valor determinado por el master, esto nos permite verificar que la aplicacion view no logro conectarse a un espacio de memoria compartida incorrecto desde el comienzo de su ejecucion. 
+El segundo es un semaforo que informa si el proceso view esta corriendo, es iniciado por defecto en 0 y luego cuando se conecta la view, se cambia a 1. Para finalizar de forma correcta ambas aplicaciones, el master vuelve a desconectar a la view poniendo en 0 este semaforo.
+El tercer byte es otro semaforo que informa el turno de cada proceso. A partir de esto, los procesos view y master pueden evitar pisarse el uno al otro. 
 
+Para evitar el uso de “busy waiting” decidimos utilizar la libreria de semaphores de postix. Decidimos hacer un hibrido entre los bytes reservados y los semaphores del API posix. Guardamos los valores dentro de los bytes reservados pero utilizabamos los semaphores para blockear o liberar los procesos cuando necesitaban manejar una espera. Se utilizaron en total 2 semaphores.
+Este hibrido fue implementado debido a problemas encontrados con la API posix de semaphores, para ver mas por favor remitirse al capitulo 3 \emph{problemas y soluciones} bajo la seccion \emph{Proceso Vista} subseccion \emph{problema de espera activa}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Utilización}
@@ -82,7 +88,11 @@ es traída al entorno de la aplicación con la función fgets.
 \section{Proceso Esclavo}
 sdfasdf
 \section{Proceso Vista}
+ssss
+\subsection{problema de espera activa}
+\emph{WIP}
 
+	Con esta libreria inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la funcion sem\_getvalue, la cual nos presento problemas en su ejecucion dentro del ciclo principal del master.  Siempre que la funcion era llamada dentro del ciclo, se generaba un segmentation fault. Debido a esto tuvimos que manejarnos sin ver los valores del semaphore por lo que finalmente decidimos hacer un hibrido entre los bytes reservados y los semaphores del API.
 asdfadsf
 Dummy text
 
@@ -90,7 +100,10 @@ Dummy text
 
 \chapter{Testing}
 \section{Sistema de Testing}
-asdfasldjfasd
+El trabajo practico cuenta con una suite de unit test para garantizar un cierto nivel de robustes.
+\subsection{Filosofia de testeo}
+Se decidio implementar unit tests para cubrir toda funcionalidad implementada por el TP que sea, por lo menos, mas de una mascara o algun agregado simlpe de una funcion de libreria standard o POSIX. 
+Esto se debe a que las estructuras de POSIX, tal como el sistema de queues y el sistema de semaforos que se proveen, resultan redundantes para testear debido a que estas funciones son de uso general y ya estan testeadas por fuera de nuestro trabajo practico. Por eso consideramos que todos los tests que meramente se resumian en un test de una funcion de POSIX no eran necesarios.
 
 \section{Fugas de Memoria}
 Era posible la presencia de fugas de memoria en cualquiera de los tres procesos, las fugas de memoria
