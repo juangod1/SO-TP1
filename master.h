@@ -2,6 +2,8 @@
 // Created by juangod on 23/03/18.
 //
 #include <stdlib.h>
+#include <semaphore.h>
+
 
 #ifndef SO_TP1_MASTER_H
 #define SO_TP1_MASTER_H
@@ -24,6 +26,13 @@ int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray);
 int slaveNumberCalculator(int numberOfFiles);
 void  createSlaves(int numberOfFiles, int testMode);
 void cleanBuffer(void * buff, int buffSize);
+
+void openSemaphores(sem_t ** semaphoreStatusPointer, sem_t **visualConnectedPointer);
+void closeSemaphores(sem_t ** visualConnectedPointer, sem_t **semaphoreStatusPointer);
+void fetchSemaphoreValue(sem_t *semaphorePointer, int *semaphoreValue);
+void createBufferConnection(key_t key, char ** asignedBufferAddress);
+void cleanBufferConnections(key_t key);
+
 void run(int argc, const char ** argv, int testMode);
 
 #endif //SO_TP1_MASTER_H

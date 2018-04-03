@@ -40,17 +40,10 @@ int main(int argc, char ** argv)
   char * readingAddress;
   //Starting buffer connection
   readingAddress = createConnectionWithSharedMemory(connectionId);
-  
+
   sem_t * visSem;
   sem_t * semSem;
   openSemaphores(&visSem,&semSem);
-
-  // printf("Testing Print parameter to terminal...\n");
-  // testPrintArgumentToTerminal();
-  // testPrintToTerminal();
-
-  // printf("Testing Print after a change of value...\n");
-  // testPrintAfterChange();
 
   //Connect to master
   *((char *)readingAddress+1) = GREEN; // Second byte of buffer
@@ -67,7 +60,7 @@ int main(int argc, char ** argv)
             *((char *)readingAddress+2) = RED;
             sem_post(visSem);
             break;
-        case RED:                      
+        case RED:
             sem_wait(semSem);
             break;
         default:

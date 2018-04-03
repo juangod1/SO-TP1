@@ -29,15 +29,9 @@
 
 int connectionId;
 
-void openSemaphores(sem_t ** semaphoreStatusPointer, sem_t **visualConnectedPointer);
-void closeSemaphores(sem_t ** visualConnectedPointer, sem_t **semaphoreStatusPointer);
-void fetchSemaphoreValue(sem_t *semaphorePointer, int *semaphoreValue);
-void createBufferConnection(key_t key, char ** asignedBufferAddress);
-void cleanBufferConnections(key_t key);
-//Testing Buffer ToDelete
-void testBufferAlternate();
 
-void run(int argc, const char ** argv, int testMode){
+void run(int argc, const char ** argv, int testMode)
+{
     //BufferAdress for shared memory
     char * bufferAddress;
 
@@ -99,7 +93,8 @@ void run(int argc, const char ** argv, int testMode){
     //Wait 10 seconds to be able to run view
     sleep(10);
 
-    while(hashCount < numberOfFiles){
+    while(hashCount < numberOfFiles)
+    {
         //This two variables can be moved to the beginning of "run".
         char hashBuffer[PATH_MAX+HASH_SIZE+1] = {0};
 
@@ -108,7 +103,6 @@ void run(int argc, const char ** argv, int testMode){
             case RED:
                 cleanBuffer(bufferAddress,BUFFER_SIZE);
                 if(isEmpty(HASHQ_ID)){
-                  //printf("Queue is empty.... waiting hashCount: %d. numberOfFiles: %d\n",hashCount,numberOfFiles);
                   break;
                 }
                 if (getMessage(HASHQ_ID,HASH_SIZE+PATH_MAX,hashBuffer)>0){
@@ -136,7 +130,8 @@ void run(int argc, const char ** argv, int testMode){
     fclose(fileToWrite);
 
     //Disconnect the visual process
-    if(*((char *)bufferAddress+1)){
+    if(*((char *)bufferAddress+1))
+    {
         *((char *)bufferAddress+1) = RED;
         *((char *)bufferAddress+2) = RED;
         sem_post(semSem);
