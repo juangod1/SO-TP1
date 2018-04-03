@@ -137,7 +137,7 @@ void run(int argc, const char ** argv, int mode)
         }
     }
     fclose(fileToWrite);
-    printf("Hashs written to Hashdump file\n");
+    printf("Hashes written to HashDump/hashDump.txt\n");
 
     //Disconnect the visual process
     if(*((char *)bufferAddress+1))
