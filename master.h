@@ -18,6 +18,8 @@
 #define QID_MAX_DIGITS 5
 #define IS_TEST_SLAVE 2
 #define IS_NOT_TEST_SLAVE 1
+#define VIEW_IS_CONNECTED_BYTE *((char *)bufferAddress+1)
+#define PROCESS_TURN_SEMAPHORE_BYTE *((char *)bufferAddress+2)
 
 
 void * createBuffer(size_t size);

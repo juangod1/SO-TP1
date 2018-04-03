@@ -86,8 +86,8 @@ void run(int argc, const char ** argv, int mode)
 
     //Process cycle
     *((char *)bufferAddress) = 100; //Safety code
-    *((char *)bufferAddress+1) = RED;
-    *((char *)bufferAddress+2) = RED;
+    VIEW_IS_CONNECTED_BYTE = RED;
+    PROCESS_TURN_SEMAPHORE_BYTE = RED;
 
     putchar('\n');
 
@@ -121,15 +121,15 @@ void run(int argc, const char ** argv, int mode)
                 memcpy(bufferAddress+3,hashBuffer,HASH_SIZE+PATH_MAX);
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"%s\n",hashBuffer);
-                *((char *)bufferAddress+2) = GREEN;
+                PROCESS_TURN_SEMAPHORE_BYTE = GREEN;
                 sem_post(semSem);
                 break;
             case GREEN:
-                if(*((char *)bufferAddress+1)){
+                if(VIEW_IS_CONNECTED_BYTE){
                     sem_wait(visSem);
                 }
                 else
-                    *((char *)bufferAddress+2) = RED;
+                    PROCESS_TURN_SEMAPHORE_BYTE = RED;
                 break;
             default:
                 perror("Illegal semaphore state ERROR");
@@ -140,7 +140,7 @@ void run(int argc, const char ** argv, int mode)
     printf("Hashes written to HashDump/hashDump.txt\n");
 
     //Disconnect the visual process
-    if(*((char *)bufferAddress+1))
+    if(VIEW_IS_CONNECTED_BYTE)
     {
         *((char *)bufferAddress+1) = RED;
         *((char *)bufferAddress+2) = RED;
