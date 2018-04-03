@@ -82,7 +82,7 @@ int readMD5(const char* path, char* buffer)
     return -1;
   }
   int i; char ch;
-  for (i = 1; i < MAX_PATH_LEN && path[i] != '\0'; i++)
+  for (i = 0; i < MAX_PATH_LEN && path[i] != '\0'; i++)
   {
     *(buffer++) = path[i];
   }

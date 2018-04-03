@@ -28,8 +28,8 @@ int testRun(mqd_t fileQueueDescriptor, mqd_t hashQueueDescriptor)
 {
     printf("Test MD5 Hashing:");
     testMD5Hashing();
-    printf("Test getting item from file queue:");
-    testGettingItemFromFileQueue(fileQueueDescriptor);
+    //printf("Test getting item from file queue:");
+    //testGettingItemFromFileQueue(fileQueueDescriptor);
     return 0;
 }
 //TODO: esto es testeo de posix?
