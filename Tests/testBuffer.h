@@ -2,7 +2,7 @@
 #define TESTBUFFER_H
 
 
-void createBufferTest();
+void createTestBuffer();
 void readWriteBufferTest();
 
 void givenAKey();

@@ -17,6 +17,7 @@
 #include <limits.h>
 #include <sys/wait.h>
 #include "Tests/masterTest.h"
+#include "Tests/testBuffer.h"
 
 //Var for shared memory space. Cuando todo este funcionando, se pone su .h correspondiente
 #include <sys/types.h>
@@ -53,6 +54,7 @@ void run(int argc, const char ** argv, int testMode){
     if(testMode)
     {
       int * status=malloc(4); pid_t wpid;
+      createTestBuffer();
       createTestQueue(queueIDs);
       createTestSlave();
       while ((wpid = wait(status)) > 0); //wait for all child processes

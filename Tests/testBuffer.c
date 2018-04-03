@@ -1,9 +1,28 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/shm.h>
+#include <sys/ipc.h>
 
 #include "testlib.h"
 #include "testBuffer.h"
+#include "../master.h"
 
+void createTestBuffer();
+void createBufferTest();
+void readWriteBufferTest();
+
+void givenAKey();
+void givenABuffer();
+void givenAStringToWrite();
+
+void whenAllocatingBufferSpace();
+void whenWritingStringToBuffer();
+void whenReadingStringFromBuffer();
+
+void thenSomeBufferIsCreated();
+void thenStringsMatch();
+
+void createBufferConnection(key_t key, char ** buffer);
 
 char * buffer;
 char * readString;
@@ -11,14 +30,15 @@ key_t key;
 char * string;
 char * writeString;
 
-/*int main()
+
+void createTestBuffer()
 {
     printf("Test create buffer: ");
     createBufferTest();
 
     printf("Test read write buffer: ");
     readWriteBufferTest();
-}*/
+}
 
 void createBufferTest()
 {
@@ -43,9 +63,7 @@ void givenAKey()
 
 void whenAllocatingBufferSpace()
 {
-    //para que quede mas limpio se le tiene que pasar
-    //el adress por parametro a createBufferAlternate
-    //createBufferAlternate(key, buffer); ESTA FUNCION NO EXISTE
+    createBufferConnection(key, &buffer);
 }
 
 void thenSomeBufferIsCreated()
@@ -55,7 +73,7 @@ void thenSomeBufferIsCreated()
 
 void givenABuffer()
 {
-    //createBufferAlternate(key, buffer); ESTA FUNCION NO EXISTE
+    createBufferConnection(key, &buffer);
 }
 
 void givenAStringToWrite()
