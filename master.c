@@ -111,7 +111,6 @@ void run(int argc, const char ** argv, int testMode)
                 memcpy(bufferAddress+3,hashBuffer,HASH_SIZE+PATH_MAX);
                 //maybe we should integrate the hash format with the MD5_CMD_FMT form the salve.
                 fprintf(fileToWrite,"%s\n",hashBuffer);
-                // TODO: write hash to file on disc
                 *((char *)bufferAddress+2) = GREEN;
                 sem_post(semSem);
                 break;

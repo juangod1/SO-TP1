@@ -1,3 +1,4 @@
 #!/bin/bash
-./Binaries/run $@ & ./Binaries/view $(pgrep -o -x run)
+./Binaries/run $@ &
+./Binaries/view $(pgrep -o -x run ) &
 
