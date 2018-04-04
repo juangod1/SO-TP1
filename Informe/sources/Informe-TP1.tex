@@ -9,6 +9,8 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \graphicspath{ {../images/} }
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 
 \definecolor{darkcerulean}{rgb}{0.03, 0.27, 0.49}
 
@@ -43,7 +45,14 @@
 
 \chapter{Diseño}
 \section{Diseño del Sistema}
-El programa fue diseñado para linux
+La aplicación fue diseñada para el sistema operativo Linux, pero debería funcionar para cualquier sistema operativo que respete la norma POSIX. El sistema consiste en tres tipos de procesos, un proceso maestro, un proceso vista y \textit{S} procesos esclavos, \textit{S} se calcula en base a la cantidad de archivos a procesar mediante la fórmula:
+\\\\ $Sea\ N\ el\ numero\ de\ archivos\ a\ procesar,\ P\ el\ indice\ de\ proceso\ ponderado\,$
+ \begin{center}
+  $S = \ceil*{\dfrac{N}{P}}$\\
+ \end{center}
+\indent El índice de proceso ponderado actualmente está definido como 4. Encontrar el índice de proceso ponderado más eficiente(o una fórmula que lo represente) excede los objetivos del trabajo práctico por lo que no se discutirá fuera de esta aclaración. 
+\\ \indent La aplicación comunica los distintos procesos entre sí mediante semáforos, \textit{message queues} y zonas de memoria compartida. El funcionamiento de la aplicación es el siguiente:
+El proceso maestro es ejecutado y encola los \textit{N} archivos a procesar a una cola de mensajes (a la cual tienen acceso los \textit{S} procesos esclavos) y crea los procesos esclavos. El proceso esclavo recibe el archivo a procesar leyendo de dicha cola, lo procesa, y envía el resultado mediante otra cola al proceso maestro. Luego dicho proceso lee otro archivo de la cola de archivos y repite el procedimiento, y si está vacía, termina su ejecución. El proceso maestro lee de la cola de archivos y escribe el resultado a disco, luego revisa el semáforo para escribir en el buffer compartido, si no es su turno y el proceso vista está conectado, duerme hasta que el semáforo cambie de estado antes de poder realizar la escritura en el buffer. Cuando el proceso maestro termina de escribir en el buffer, cambia de estado el semáforo. Si el proceso vista no está conectado el semáforo cambia de estado instantáneamente. El proceso vista duerme hasta que el semáforo indique su turno, cuando lo es, lee del buffer compartido, escribe en pantalla la información deseada y cambia de estado el semáforo. 
 \section{IPCs}
 \subsection{Message Queue}
 	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento FIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro.
