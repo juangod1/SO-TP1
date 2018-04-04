@@ -23,7 +23,6 @@ void testMasterRun()
   givenNothing();
   whenAddingItemToFileQueue();
   thenFileQueueIsNotEmpty();
-  printf("Testing slave creation:");
   createTestSlave();
 }
 

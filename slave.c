@@ -31,6 +31,7 @@ int main(int argc, const char ** argv)
 
   if(isTest)
   {
+    printf("Entering slave testing...\n");
     testRun(fileQueueDescriptor,hashQueueDescriptor);
     fflush(stdout);
     exit(1);

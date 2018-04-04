@@ -33,10 +33,10 @@ char * writeString;
 
 void createTestBuffer()
 {
-    printf("Test create buffer: ");
+    printf("Test create buffer:");
     createBufferTest();
 
-    printf("Test read write buffer: ");
+    printf("Test read write buffer:");
     readWriteBufferTest();
 }
 
