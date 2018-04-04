@@ -19,7 +19,7 @@
 	\color{black}Sistemas Operativos (72.11) \\
 	\includegraphics{itba-escudo2}
 	}
-\author{Juan Godfrid - 56609 \\Pablo Radnic - 57013 \\ Joaquín Ormachea - \\Francisco Delgado -}
+\author{Juan Godfrid - 56609 \\Pablo Radnic - 57013 \\ Joaquín Ormachea - 57034\\Francisco Delgado - 57101}
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{ Instituto Tecnológico de Buenos Aires - 2018}
@@ -52,7 +52,7 @@ La aplicación fue diseñada para el sistema operativo Linux, pero debería func
  \end{center}
 \indent El índice de proceso ponderado actualmente está definido como 4. Encontrar el índice de proceso ponderado más eficiente(o una fórmula que lo represente) excede los objetivos del trabajo práctico por lo que no se discutirá fuera de esta aclaración. 
 \\ \indent La aplicación comunica los distintos procesos entre sí mediante semáforos, \textit{message queues} y zonas de memoria compartida. El funcionamiento de la aplicación es el siguiente:
-El proceso maestro es ejecutado y encola los \textit{N} archivos a procesar a una cola de mensajes (a la cual tienen acceso los \textit{S} procesos esclavos) y crea los procesos esclavos. El proceso esclavo recibe el archivo a procesar leyendo de dicha cola, lo procesa, y envía el resultado mediante otra cola al proceso maestro. Luego dicho proceso lee otro archivo de la cola de archivos y repite el procedimiento, y si está vacía, termina su ejecución. El proceso maestro lee de la cola de archivos y escribe el resultado a disco, luego revisa el semáforo para escribir en el buffer compartido, si no es su turno y el proceso vista está conectado, duerme hasta que el semáforo cambie de estado antes de poder realizar la escritura en el buffer. Cuando el proceso maestro termina de escribir en el buffer, cambia de estado el semáforo. Si el proceso vista no está conectado el semáforo cambia de estado instantáneamente. El proceso vista duerme hasta que el semáforo indique su turno, cuando lo es, lee del buffer compartido, escribe en pantalla la información deseada y cambia de estado el semáforo. 
+El proceso maestro es ejecutado y encola los \textit{N} archivos a procesar a una cola de mensajes (a la cual tienen acceso los \textit{S} procesos esclavos) y crea los procesos esclavos. El proceso esclavo recibe el archivo a procesar leyendo de dicha cola, lo procesa, y envía el resultado mediante otra cola al proceso maestro. Luego dicho proceso lee otro archivo de la cola de archivos y repite el procedimiento, y si está vacía, termina su ejecución. El proceso maestro lee de la cola de \textit{hashes} y escribe el resultado a disco, luego revisa el semáforo para escribir en el buffer compartido, si no es su turno y el proceso vista está conectado, duerme hasta que el semáforo cambie de estado antes de poder realizar la escritura en el buffer. Cuando el proceso maestro termina de escribir en el buffer, cambia de estado el semáforo. Si el proceso vista no está conectado el semáforo cambia de estado instantáneamente. El proceso vista duerme hasta que el semáforo indique su turno, cuando lo es, lee del buffer compartido, escribe en pantalla la información deseada y cambia de estado el semáforo. 
 \section{IPCs}
 \subsection{Message Queue}
 	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento FIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo este comportamiento se realiza sin gastar un solo ciclo de procesamiento del proceso maestro. Las \textit{message queues} resultan ineficaces en situaciones en las que se envían datos sin cota superior de tamaño, en cual situación sería más adecuado usar un \textit{pipe}. Pero al ser datos acotados (\textit{hash} = 32 bytes, nombre de archivo maximo y path maximo definidos por POSIX), los \textit{message queues} son óptimos para el problema. 
@@ -60,7 +60,7 @@ El proceso maestro es ejecutado y encola los \textit{N} archivos a procesar a un
 Con respecto a los métodos de intercomunicación de procesos para respetar sus “turnos” de actividad sobre la memoria compartida, optamos por dejar 3 bytes delante del buffer denominados Safety Code, Visual Semaphore y Status Semaphore, respectivamente. 
 Safety Code tiene un valor determinado por el proceso maestro, esto nos permite verificar que la aplicacion vista no conecte a un espacio de memoria compartida incorrecto desde el comienzo de su ejecucion. 
 Visual Semaphore es un semáforo que informa si el proceso vista está corriendo, es iniciado por defecto en 0 y cuando se conecta la aplicación, se cambia a 1. Para finalizar de forma correcta ambas aplicaciones, el proceso maestro desconecta a la aplicación vista poniendo en 0 este semáforo.
-Por último, Status Semaphore es un indicador del turno de cada proceso, 0 para el proceso maestro y 1 para el proceso vista. A partir de esto, los procesos maestro y vista evitan colisiones entre ellas. 
+Por último, Status Semaphore es un indicador del turno de cada proceso en la utilización del buffer, 0 para el proceso maestro y 1 para el proceso vista. A partir de esto, los procesos maestro y vista evitan colisiones entre ellos. 
 
 Para evitar el \textit{busy waiting} utilizamos la librería de semáforos de POSIX. Decidimos hacer un híbrido entre los bytes reservados y los semaphores del API de POSIX. Guardamos los valores dentro de los bytes reservados y utilizamos los semáforos POSIX para bloquear o liberar los procesos cuando necesitan manejar una espera. Este híbrido fue implementado debido a problemas encontrados en la API de POSIX de semáforos. \textit{Léase: Sección 3.1.1}.
 \subsection{Memoria Compartida}
@@ -103,11 +103,11 @@ El programa maestro posee la opción \textit{-t} para ejecutar los testeos unita
 El \textit{message queue} que devuelve los \textit{hashes} se crea con la opción de bloqueo de POSIX activada, esto hace que el proceso se bloquee por parte del sistema operativo cuando la cola esta vacía y luego el sistema operativo desbloquea el proceso cuando la cola pasa a no vacía, así evitando el problema de espera activa.
 \section{Proceso Esclavo}
 \subsection{\textit{Hasheo} de archivos}
-Nos vimos ante la necesidad de utilizar la función de Linux md5sum para conseguir el hash de los archivos. Sin embargo este función
-era únicamente accesible a través de línea de comandos de Linux y no en el entorno de biblioteca de funciones de c. Al no tener las
+Nos vimos ante la necesidad de utilizar la función de Linux md5sum para conseguir el hash de los archivos. Sin embargo esta función
+era únicamente accesible a través de línea de comandos de Linux y no en el entorno de biblioteca de funciones de C. Al no tener las
 herramientas para crear una función propia debimos encontrar otra solución para el problema.
 
-Luego de investigación en Internet se propuso utilizar la función popen() con parámetro cmd que ejecuta un proceso de línea de comandos
+Luego de investigar se propuso utilizar la función popen() con parámetro cmd que ejecuta un proceso de línea de comandos
 de Linux y a través de él ejecutar la función md5sum con los parámetros correspondientes. Luego la salida de la ejecución de las funciones
 es traída al entorno de la aplicación con la función fgets.
 \section{Proceso Vista}
@@ -142,6 +142,19 @@ los registros del programa para distintos parámetros.
 
 
 
+>> valgrind ./Binaries/slave a a
+
+==13485== HEAP SUMMARY:
+==13485==     in use at exit: 0 bytes in 0 blocks
+==13485==   total heap usage: 4 allocs, 4 frees, 8,704 bytes allocated
+==13485== 
+==13485== All heap blocks were freed -- no leaks are possible
+==13485== 
+==13485== For counts of detected and suppressed errors, rerun with: -v
+==13485== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+
+
 >> valgrind ./Binaries/view 28143
 
 ==28234== 
@@ -159,19 +172,6 @@ los registros del programa para distintos parámetros.
 ==28234== 
 ==28234== For counts of detected and suppressed errors, rerun with: -v
 ==28234== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
-
-
-
->> valgrind ./Binaries/slave a a
-
-==13485== HEAP SUMMARY:
-==13485==     in use at exit: 0 bytes in 0 blocks
-==13485==   total heap usage: 4 allocs, 4 frees, 8,704 bytes allocated
-==13485== 
-==13485== All heap blocks were freed -- no leaks are possible
-==13485== 
-==13485== For counts of detected and suppressed errors, rerun with: -v
-==13485== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 \end{lstlisting}
 
  Podemos afirmar que para los casos vistos nuestros programas no presentan fugas de memoria excepto en la ejecución de la vista, analicemos dicho caso con mayor profundidad:\newline\newline 
@@ -226,7 +226,7 @@ los registros del programa para distintos parámetros.
 \end{lstlisting}
 
 
-Los \textit{leaks} surgen de los semáforos que son utilizados tanto por el proceso vista como por el proceso maestro, pero solo aparecen como fugas en el proceso vista. Esto se debe a que los semáforos son cerrados por el proceso maestro, por lo tanto valgrind afirma que son fugas de memoria ya que exceden al proceso vista. 
+Los \textit{leaks} surgen de los semáforos que son utilizados tanto por el proceso vista como por el proceso maestro, pero solo aparecen como fugas en el proceso vista. Esto se debe a que los semáforos son cerrados por el proceso maestro, por lo tanto valgrind afirma que son fugas de memoria ya que exceden al proceso vista, pero definitivamente son cerrados por el proceso maestro ya que no surgen en el testeo de dicho proceso. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
