@@ -74,7 +74,7 @@ void run(int argc, const char ** argv, int mode)
   while(hashCount < numberOfFiles)
   {
       char hashBuffer[PATH_MAX+HASH_SIZE+1] = {0};
-      switch(*((char *)bufferAddress+2))
+      switch(PROCESS_TURN_SEMAPHORE_BYTE)
       {
           case RED:
               cleanBuffer(bufferAddress,BUFFER_SIZE);
@@ -101,6 +101,9 @@ void run(int argc, const char ** argv, int mode)
               exit(-1);
       }
   }
+    while(PROCESS_TURN_SEMAPHORE_BYTE) // Wait for view to disconnect
+        sleep(1); // Semi active wait bearable in this scenario
+
   fclose(fileToWrite);
   printf("Hashes written to \'HashDump/hashDump.txt\'\n");
 
@@ -248,7 +251,7 @@ void waitForViewSystem(key_t uniqueKeyPid, char * bufferAddress)
     if(i%20==0){
       putchar('\n');
     }
-    sleep(1);
+    sleep(1); // Semi-active wait is bearable during setup stage
     putchar('.');
     fflush(stdout);
 
