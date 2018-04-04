@@ -58,6 +58,7 @@ void run(int argc, const char ** argv, int mode)
   if(numberOfFiles<=0)
   {
       printf("Error: no programs are hashable\nExiting program...\n");
+      fclose(fileToWrite);
       exit(-1);
   }
 
