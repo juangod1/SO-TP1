@@ -17,7 +17,7 @@
 	\color{black}Sistemas Operativos (72.11) \\
 	\includegraphics{itba-escudo2}
 	}
-\author{Juan Godfrid - 56609 \\Pablo Radnic - 57013 \\ Joaquín Ormachea - \\Francisco Delgado - 57101}
+\author{Juan Godfrid - 56609 \\Pablo Radnic - 57013 \\ Joaquín Ormachea - \\Francisco Delgado -}
 \pagestyle{fancy}
 \fancyhf{}
 \lhead{ Instituto Tecnológico de Buenos Aires - 2018}
@@ -42,20 +42,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Diseño}
-
 \section{Diseño del Sistema}
-El sistema se basa en tres programas, el programa maestro, el programa esclavo y el programa vista. Entre estos se reparten las tareas para que el sistema funcione como fue especificado. En particular el programa maestro y la vista, si es que se corre la vista, corren como un solo proceso, mientras que el programa esclavo corre muchas veces en distintos procesos permitiendo la paralelizacion ya que este es quien hace la mayoria del calculo intensivo el cual consiste en el calculo de hashes.
-
-\subsection{Programa maestro}
-	El programa maestro se encarga de recibir por argumento los archivos que deben ser hasheados. Los argumentos se encolan dentro de una queue de paths para luego ser consultada por los processos esclavos cuando los mismos ejecuten. Crea ademas una cola para los hashes que utilizaran los processos esclavos para ellos encolar los hashes calculados con el nombre del archivo que fue hasheado. El processo maestro consulta la queue para obtener de ella los hashes con el nombre del archivo e incluirlo en el archivo de hashes en disco y escribirlo en la memoria compartida, la cual es utilizada para el proceso vista.
-
-	Para generar los processos esclavos el processo maestro primero calcula la cantidad de escalvos que utilizara en base a la cantidad de archivos que fueron pasados por parametro, la intencion de esto es que a mayor cantidad de archivos se utilizen una mayor cantidad de esclavos para poder balancear la paralelizacion con el hecho de que tampoco se desea tener un esclavo para uno o dos archivos solamente.
-\subsection{programa esclavo}
-	El programa esclavo se encarga de calcular los hashes que solicita el proceso maestro, para esto cada processo esclavo abre la cola de archivos y la cola de hashes asi pudiendo interactuar con el proceso maestro. Luego este lee de la cola de archivos para hashearlos. Una vez que obtiene el path de el archivo que el debe hashear este abre una shell y corre el programa md5sum para obtener de la misma el hash.
-	Una vez obtenido el hash el programa forma el string compuesto por el nombre de el archivo con su hash y lo encola en la cola de hashes para que lo maneje el processo maestro.
-
-\subsection{programa vista}
-	El programa vista puede mostrar los hashes que se calculan en tiempo real si este se corre. Para hacer esto utiliza la zona de memoria compartida que se menciono en el programa maestro, se conecta a esta zona de memoria compartida utilizando como clave el PID del proceso maestro que lo recibe por parametro. Como el proceso de vista quiere leer del buffer de memoria compartida mientras que el proceso maestro escribe se tuvo que implementar un sistema de semaforos \emph{WIP orma pl0x explain}.
+dshfdshfdshfds
 \section{IPCs}
 \subsection{Message Queue}
 	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento FIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro.
@@ -108,7 +96,7 @@ ssss
 
 \chapter{Testing}
 \section{Sistema de Testing}
-El trabajo practico cuenta con una suite de unit test para garantizar un cierto nivel de robustes.
+El Trabajo Práctico cuenta con una suite de testeos unitarios para garantizar un cierto nivel de robustez.
 \subsection{Filosofia de testeo}
 Se decidio implementar unit tests para cubrir toda funcionalidad implementada por el TP que sea, por lo menos, mas de una mascara o algun agregado simlpe de una funcion de libreria standard o POSIX. 
 Esto se debe a que las estructuras de POSIX, tal como el sistema de queues y el sistema de semaforos que se proveen, resultan redundantes para testear debido a que estas funciones son de uso general y ya estan testeadas por fuera de nuestro trabajo practico. Por eso consideramos que todos los tests que meramente se resumian en un test de una funcion de POSIX no eran necesarios.
@@ -165,11 +153,10 @@ Podemos afirmar que para los casos vistos nuestros programas no presentan fugas 
 
 \chapter{Limitaciones}
 \section{Limitaciones del Sistema}
-asdfasldjfasd
+max message
 
 \section{Limitaciones de la Implementación}
-asdfasdf
-Dummy text
+un archivo no se puede llamar -t -w
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
