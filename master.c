@@ -101,7 +101,7 @@ void run(int argc, const char ** argv, int mode)
               exit(-1);
       }
   }
-    while(PROCESS_TURN_SEMAPHORE_BYTE) // Wait for view to disconnect
+    while(PROCESS_TURN_SEMAPHORE_BYTE && VIEW_IS_CONNECTED_BYTE) // Wait for view to finish
         sleep(1); // Semi active wait bearable in this scenario
 
   fclose(fileToWrite);
