@@ -64,6 +64,10 @@ Por último, Status Semaphore es un indicador del turno de cada proceso, 0 para 
 
 Para evitar el \textit{busy waiting} utilizamos la librería de semáforos de POSIX. Decidimos hacer un híbrido entre los bytes reservados y los semaphores del API de POSIX. Guardamos los valores dentro de los bytes reservados y utilizamos los semáforos POSIX para bloquear o liberar los procesos cuando necesitan manejar una espera. Este híbrido fue implementado debido a problemas encontrados en la API de POSIX de semáforos. \textit{Léase: Sección 3.1.1}.
 \subsection{Memoria Compartida}
+Para la comunicación entre el proceso maestro y el proceso vista se implementó, entre otras cosas, un buffer de memoria compartida para poder enviar los hashes desde el proceso maestro al proceso vista, para que este pueda mostrarlos.
+El buffer de memoria compartida contiene los tres bytes de semáforo explicados en la sección 1.2.2, además tiene espacio asignado para el maximo tamaño que puede tener el path de un archivo, más los 32 bytes del \textit{hash md5}.
+El proceso maestro se encarga de inicializar y escribir en el buffer de memoria compartida, mientras que el proceso vista accede a esta memoria usando como clave de accesso el PID del proceso maestro y se encarga de mostrar el contenido del buffer en consola cuando el semáforo le indique.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Utilización}

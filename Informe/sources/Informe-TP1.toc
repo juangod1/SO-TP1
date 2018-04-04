@@ -5,21 +5,21 @@
 \contentsline {subsection}{\numberline {1.2.1}Message Queue}{3}
 \contentsline {subsection}{\numberline {1.2.2}Sem\IeC {\'a}foros}{3}
 \contentsline {subsection}{\numberline {1.2.3}Memoria Compartida}{3}
-\contentsline {chapter}{\numberline {2}Utilizaci\IeC {\'o}n}{4}
-\contentsline {section}{\numberline {2.1}Compilaci\IeC {\'o}n y Ejecuci\IeC {\'o}n}{4}
-\contentsline {section}{\numberline {2.2}Proceso Vista}{4}
-\contentsline {section}{\numberline {2.3}Testeo}{4}
-\contentsline {chapter}{\numberline {3}Problemas y Resoluciones}{5}
-\contentsline {section}{\numberline {3.1}Proceso Maestro}{5}
-\contentsline {subsection}{\numberline {3.1.1}Problema de espera activa}{5}
-\contentsline {section}{\numberline {3.2}Proceso Esclavo}{5}
-\contentsline {subsection}{\numberline {3.2.1}\textit {Hasheo} de archivos}{5}
-\contentsline {section}{\numberline {3.3}Proceso Vista}{5}
-\contentsline {subsection}{\numberline {3.3.1}Problema de espera activa}{5}
-\contentsline {chapter}{\numberline {4}Testing}{7}
-\contentsline {section}{\numberline {4.1}Unit testing}{7}
-\contentsline {section}{\numberline {4.2}Fugas de Memoria}{7}
-\contentsline {chapter}{\numberline {5}Limitaciones}{10}
-\contentsline {section}{\numberline {5.1}Limitaciones del Sistema e Implementaci\IeC {\'o}n}{10}
-\contentsline {chapter}{\numberline {6}Bibliograf\IeC {\'\i }a}{11}
-\contentsline {section}{\numberline {6.1}Fuentes}{11}
+\contentsline {chapter}{\numberline {2}Utilizaci\IeC {\'o}n}{5}
+\contentsline {section}{\numberline {2.1}Compilaci\IeC {\'o}n y Ejecuci\IeC {\'o}n}{5}
+\contentsline {section}{\numberline {2.2}Proceso Vista}{5}
+\contentsline {section}{\numberline {2.3}Testeo}{5}
+\contentsline {chapter}{\numberline {3}Problemas y Resoluciones}{6}
+\contentsline {section}{\numberline {3.1}Proceso Maestro}{6}
+\contentsline {subsection}{\numberline {3.1.1}Problema de espera activa}{6}
+\contentsline {section}{\numberline {3.2}Proceso Esclavo}{6}
+\contentsline {subsection}{\numberline {3.2.1}\textit {Hasheo} de archivos}{6}
+\contentsline {section}{\numberline {3.3}Proceso Vista}{6}
+\contentsline {subsection}{\numberline {3.3.1}Problema de espera activa}{6}
+\contentsline {chapter}{\numberline {4}Testing}{8}
+\contentsline {section}{\numberline {4.1}Unit testing}{8}
+\contentsline {section}{\numberline {4.2}Fugas de Memoria}{8}
+\contentsline {chapter}{\numberline {5}Limitaciones}{11}
+\contentsline {section}{\numberline {5.1}Limitaciones del Sistema e Implementaci\IeC {\'o}n}{11}
+\contentsline {chapter}{\numberline {6}Bibliograf\IeC {\'\i }a}{12}
+\contentsline {section}{\numberline {6.1}Fuentes}{12}
