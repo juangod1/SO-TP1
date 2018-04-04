@@ -107,15 +107,14 @@ Luego de investigación en Internet se propuso utilizar la función popen() con 
 de Linux y a través de él ejecutar la función md5sum con los parámetros correspondientes. Luego la salida de la ejecución de las funciones
 es traída al entorno de la aplicación con la función fgets.
 \section{Proceso Vista}
-ssss
 \subsection{Problema de espera activa}
-	Con la librería POSIX de semáforos inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la función \textit{sem\_getvalue}, la cual nos presentó problemas en su ejecución dentro del ciclo principal del master. Siempre que la función era llamada dentro del ciclo, se generaba un \textit{segmentation fault}. Debido a esto tuvimos que manejarnos sin ver los valores del semaphore por lo que finalmente decidimos hacer un híbrido entre los bytes reservados y los semáforos del API, así evitando la espera activa mediante la utilización de los semáforos de la API y utilizando los valores de los semáforos en el buffer de memoria compartida.
+	Con la librería POSIX de semáforos inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la función \textit{sem\_getvalue}, la cual nos presentó problemas en su ejecución dentro del ciclo principal del master. Decidimos hacer un híbrido entre los bytes reservados y los semáforos del API, así evitando la espera activa mediante la utilización de los semáforos de la API y utilizando los valores de los semáforos en el buffer de memoria compartida.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Testing}
 \section{Unit testing}
-Se decidió implementar unit tests para cubrir toda funcionalidad implementada por el TP que sea, por lo menos, más de una mascara o algun agregado simlpe a una funcion de la librería estándar o POSIX. 
+Se decidió implementar unit tests para cubrir toda funcionalidad implementada por el TP que sea, por lo menos, más de una mascara o algun agregado simple a una funcion de la librería estándar o POSIX. 
 Esto se debe a que las estructuras de POSIX, tal como el sistema de queues y el sistema de semáforos que se proveen, resultan redundantes para testear debido a que estas funciones son de uso general del sistema operativo y ya estan testeadas por fuera de nuestro trabajo práctico. Por eso consideramos que todos los tests que meramente se resumían en un test de una función de POSIX no eran necesarios.
 
 \section{Fugas de Memoria}
@@ -231,17 +230,20 @@ Los \textit{leaks} surgen de los semáforos que son utilizados tanto por el proc
 \section{Limitaciones del Sistema e Implementación}
 
 \begin{itemize}
-\item max message
-
-\item  El sistema no cuenta con una búsqueda recursiva de archivos. Por ejemplo, pasar por parámetro ./* solo adjunta los archivos
-  pertenecientes al directorio actual, no aquellos que pertenezcan a los subdirectorios del mismo.
+\item Los sistemas POSIX poseen un techo sobre la máxima cantidad de mensajes que 
+puede tener una message queue, dicho máximo está dado por el menor de los valores de \begin{verbatim}/proc/sys/fs/mqueue/msg_max
+\end{verbatim}
+ y \begin{verbatim}/proc/sys/fs/mqueue/msg_default 
+\end{verbatim}
+Afortunadamente dichos archivos son fáciles de modificar, si se envían más archivos que el máximo, un mensaje de alerta se enviará explicando el error y como modificar los archivos. 
+\item  El sistema no cuenta con una búsqueda recursiva de archivos. Por ejemplo, pasar por parámetro ./* solo adjunta los archivos pertenecientes al directorio actual, no aquellos que pertenezcan a los subdirectorios del mismo.
 
 \item Debido a que el programa reserva los argumentos -t y -w para la ejecución de modo de testeo y modo de espera, no se puede tener un archivo con este nombre como primer parámetro ya que interpretará el modo de ejecución y no un archivo para \textit{hashear}.
 
-\item   El sistema no puede calcular el hash de directorios, por una limitación de la herramienta de md5sum.
-\end{itemize}
+\item El sistema no puede calcular el \textit{hash} de directorios, por una limitación de la herramienta de md5sum.
 
-PRIVACIDAD DE LOS IPC
+\item Si existe una zona de memoria compartida asociada con la misma key que la que utiliza la aplicación(muy poco probable) previo a la ejecución, puede generar problemas.
+\end{itemize}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
