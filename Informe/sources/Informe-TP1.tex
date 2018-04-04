@@ -153,7 +153,8 @@ Podemos afirmar que para los casos vistos nuestros programas no presentan fugas 
 max message
 
 \section{Limitaciones de la Implementación}
-un archivo no se puede llamar -t -w \\
+Debido a que el programa reserva los argumentos -t y -w para la ejecucion de modo de testeo o modo wait no se puede tener un archivo con este nombre como primer archivo ya que interpretara como primer argumento un modo de ejecución y no un archivo en particular.
+
 PRIVACIDAD DE LOS IPC
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
