@@ -88,8 +88,8 @@ de Linux y a través de él ejecutar la función md5sum con los parámetros corr
 es traída al entorno de la aplicación con la función fgets.
 \section{Proceso Vista}
 ssss
-\subsection{problema de espera activa}
-	Con esta libreria inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la funcion sem\_getvalue, la cual nos presento problemas en su ejecucion dentro del ciclo principal del master. Siempre que la funcion era llamada dentro del ciclo, se generaba un segmentation fault. Debido a esto tuvimos que manejarnos sin ver los valores del semaphore por lo que finalmente decidimos hacer un hibrido entre los bytes reservados y los semaphores del API asi evitando la espera activa mediante la utilizacion de los semaforos de la api y utilizando los valores de los semaforos en el buffer de memoria compartida.
+\subsection{Problema de espera activa}
+	Con esta libreria inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la funcion \textit{sem\_getvalue}, la cual nos presento problemas en su ejecucion dentro del ciclo principal del master. Siempre que la funcion era llamada dentro del ciclo, se generaba un segmentation fault. Debido a esto tuvimos que manejarnos sin ver los valores del semaphore por lo que finalmente decidimos hacer un hibrido entre los bytes reservados y los semaphores del API asi evitando la espera activa mediante la utilizacion de los semaforos de la api y utilizando los valores de los semaforos en el buffer de memoria compartida.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -153,7 +153,7 @@ Podemos afirmar que para los casos vistos nuestros programas no presentan fugas 
 max message
 
 \section{Limitaciones de la Implementación}
-Debido a que el programa reserva los argumentos -t y -w para la ejecución de modo de testeo y modo de espera, no se puede tener un archivo con este nombre como primer parámetro ya que interpretará como primer argumento el modo de ejecución y no un archivo para \textit{hashear}.
+Debido a que el programa reserva los argumentos -t y -w para la ejecución de modo de testeo y modo de espera, no se puede tener un archivo con este nombre como primer parámetro ya que interpretará el modo de ejecución y no un archivo para \textit{hashear}.
 
 PRIVACIDAD DE LOS IPC
 
