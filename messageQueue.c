@@ -11,8 +11,6 @@
 #include <sys/stat.h>
 #include <string.h>
 
-#define QUEUE_OPTIONS 0666
-
 mqd_t createQueue(const char* mqName, long messageSize, long maxMessages, long mqFlags)
 {
     if(maxMessages>readSystemMaxMsg())

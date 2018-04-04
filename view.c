@@ -28,7 +28,7 @@ void closeSemaphores(sem_t ** visualConnectedPointer, sem_t ** semaphoreStatusPo
 //Receives PID through argument
 int main(int argc, char ** argv)
 {
-  //If more than 1 argument, abort.
+  //If different than 1 argument, abort.
   if(argc != 2)
   { //Argument 0 is the program name.
     perror("Error: One and only argument must be provided.\nExiting program...\n");

@@ -18,5 +18,6 @@ int isEmpty(mqd_t queueID);
 int readSystemMaxMsg();
 
 #define BASE10 10
+#define QUEUE_OPTIONS 0666
 
 #endif //SO_TP1_MESSAQUEQUEUE_H

@@ -35,10 +35,10 @@ void run(int argc, const char ** argv, int mode)
     testModeRun();
     exit(1);
   }
-  //BufferAdress for shared memory
-  char * bufferAddress;
 
-  key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well0
+  char * bufferAddress;  //BufferAdress for shared memory
+
+  key_t uniqueKeyPid = getpid();
   createBufferConnection(uniqueKeyPid, &bufferAddress);
 
   sem_t * visSem;

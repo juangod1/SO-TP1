@@ -6,7 +6,7 @@
 
 int main(int argc, const char ** argv)
 {
-    if(argc==1) // Argument zero is the program name
+    if(argc<=1) // Argument zero is the program name
     {
         printf("Error: 0 program arguments received.\nExiting program...\n");
         exit(-1);
@@ -21,7 +21,7 @@ int main(int argc, const char ** argv)
       printf("\n_____________________________\n\n.....Entering test mode.....\n\n_____________________________\n\n");
       run(argc,argv,2);
     }
-    if(strcmp(argv[1], "-w")==0)
+    if(strcmp(argv[1], "-w")==0) //wait Mode check
     {
       if(argc<3)
       {
@@ -31,7 +31,7 @@ int main(int argc, const char ** argv)
       printf("\nCommencing hashing in wait mode\n\n");
       run(argc,argv,1);
     }
-    else
+    else //normal execution
     {
       printf("\nCommencing hashing\n\n");
       run(argc,argv,0);
