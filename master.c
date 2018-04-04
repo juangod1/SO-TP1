@@ -122,8 +122,8 @@ void closeProgramConnections(sem_t * semSem, sem_t * visSem, key_t uniqueKeyPid,
 {
   if(VIEW_IS_CONNECTED_BYTE)
   {
-      *((char *)bufferAddress+1) = RED;
-      *((char *)bufferAddress+2) = RED;
+      VIEW_IS_CONNECTED_BYTE = RED;
+      PROCESS_TURN_SEMAPHORE_BYTE = RED;
       sem_post(semSem);
   }
   cleanBufferConnections(uniqueKeyPid);

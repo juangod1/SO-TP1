@@ -95,7 +95,7 @@ El programa maestro posee la opción \textit{-t} para ejecutar los testeos unita
 
 \chapter{Problemas y Resoluciones}
 \section{Proceso Maestro}
-\subsection{Problema de espera activo}
+\subsection{Problema de espera activa}
 msq recieve con block asi no hace espera activa sino que el SO lo despierta cuando la queue cambia de empty a nonempty
 \section{Proceso Esclavo}
 \subsection{\textit{Hasheo} de archivos}
@@ -125,46 +125,105 @@ Para asegurar la ausencia de fugas de memoria se tomo el recaudo de utilizar la 
 los registros del programa para distintos parámetros.
 \\\\ Registros de Valgrind:
 \begin{lstlisting}
->>valgrind ./Binaries/run ./*
+>> valgrind ./Binaries/run ./*
 
-==7295==
-==7295== HEAP SUMMARY:
-==7295==     in use at exit: 0 bytes in 0 blocks
-==7295==   total heap usage: 11 allocs, 11 frees, 17,528 bytes allocated
-==7295==
-==7295== All heap blocks were freed -- no leaks are possible
-==7295==
-==7295== For counts of detected and suppressed errors, rerun with: -v
-==7295== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
-
-
->>valgrind ./Binaries/view 1234
-
-==7550==
-==7550== HEAP SUMMARY:
-==7550==     in use at exit: 0 bytes in 0 blocks
-==7550==   total heap usage: 1 allocs, 1 frees, 1,024 bytes allocated
-==7550==
-==7550== All heap blocks were freed -- no leaks are possible
-==7550==
-==7550== For counts of detected and suppressed errors, rerun with: -v
-==7550== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==21728== 
+==21728== HEAP SUMMARY:
+==21728==     in use at exit: 0 bytes in 0 blocks
+==21728==   total heap usage: 11 allocs, 11 frees, 14,520 bytes allocated
+==21728== 
+==21728== All heap blocks were freed -- no leaks are possible
+==21728== 
+==21728== For counts of detected and suppressed errors, rerun with: -v
+==21728== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 
 
->>valgrind ./Binaries/slave a a
 
-==8156==
-==8156== HEAP SUMMARY:
-==8156==     in use at exit: 0 bytes in 0 blocks
-==8156==   total heap usage: 4 allocs, 4 frees, 8,704 bytes allocated
-==8156==
-==8156== All heap blocks were freed -- no leaks are possible
-==8156==
-==8156== For counts of detected and suppressed errors, rerun with: -v
-==8156== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+>> valgrind ./Binaries/view 28143
 
+==28234== 
+==28234== HEAP SUMMARY:
+==28234==     in use at exit: 144 bytes in 4 blocks
+==28234==   total heap usage: 5 allocs, 1 frees, 1,168 bytes allocated
+==28234== 
+==28234== LEAK SUMMARY:
+==28234==    definitely lost: 0 bytes in 0 blocks
+==28234==    indirectly lost: 0 bytes in 0 blocks
+==28234==      possibly lost: 0 bytes in 0 blocks
+==28234==    still reachable: 144 bytes in 4 blocks
+==28234==         suppressed: 0 bytes in 0 blocks
+==28234== Rerun with --leak-check=full to see details of leaked memory
+==28234== 
+==28234== For counts of detected and suppressed errors, rerun with: -v
+==28234== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+
+
+
+>> valgrind ./Binaries/slave a a
+
+==13485== HEAP SUMMARY:
+==13485==     in use at exit: 0 bytes in 0 blocks
+==13485==   total heap usage: 4 allocs, 4 frees, 8,704 bytes allocated
+==13485== 
+==13485== All heap blocks were freed -- no leaks are possible
+==13485== 
+==13485== For counts of detected and suppressed errors, rerun with: -v
+==13485== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 \end{lstlisting}
-Podemos afirmar que para los casos vistos nuestros programas no presentan fugas de memoria.
+
+ Podemos afirmar que para los casos vistos nuestros programas no presentan fugas de memoria excepto en la ejecución de la vista, analicemos dicho caso con mayor profundidad:\newline\newline 
+
+\begin{lstlisting}
+>> valgrind --leak-check=full --show-leak-kinds=all ./Binaries/view 10671
+
+==10758== 
+==10758== HEAP SUMMARY:
+==10758==     in use at exit: 144 bytes in 4 blocks
+==10758==   total heap usage: 5 allocs, 1 frees, 1,168 bytes allocated
+==10758== 
+==10758== 24 bytes in 1 blocks are still reachable in loss record 1 of 4
+==10758==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==10758==    by 0x537354E: tsearch (tsearch.c:338)
+==10758==    by 0x50547A9: check_add_mapping (sem_open.c:113)
+==10758==    by 0x505499D: sem_open (sem_open.c:181)
+==10758==    by 0x1090C4: openSemaphores (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758==    by 0x108EEF: main (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758== 
+==10758== 24 bytes in 1 blocks are still reachable in loss record 2 of 4
+==10758==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==10758==    by 0x537354E: tsearch (tsearch.c:338)
+==10758==    by 0x50547A9: check_add_mapping (sem_open.c:113)
+==10758==    by 0x505499D: sem_open (sem_open.c:181)
+==10758==    by 0x109110: openSemaphores (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758==    by 0x108EEF: main (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758== 
+==10758== 48 bytes in 1 blocks are still reachable in loss record 3 of 4
+==10758==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==10758==    by 0x5054759: check_add_mapping (sem_open.c:96)
+==10758==    by 0x505499D: sem_open (sem_open.c:181)
+==10758==    by 0x1090C4: openSemaphores (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758==    by 0x108EEF: main (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758== 
+==10758== 48 bytes in 1 blocks are still reachable in loss record 4 of 4
+==10758==    at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==10758==    by 0x5054759: check_add_mapping (sem_open.c:96)
+==10758==    by 0x505499D: sem_open (sem_open.c:181)
+==10758==    by 0x109110: openSemaphores (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758==    by 0x108EEF: main (in /home/juangod/ITBA/SO/SO-TP1/Binaries/view)
+==10758== 
+==10758== LEAK SUMMARY:
+==10758==    definitely lost: 0 bytes in 0 blocks
+==10758==    indirectly lost: 0 bytes in 0 blocks
+==10758==      possibly lost: 0 bytes in 0 blocks
+==10758==    still reachable: 144 bytes in 4 blocks
+==10758==         suppressed: 0 bytes in 0 blocks
+==10758== 
+==10758== For counts of detected and suppressed errors, rerun with: -v
+==10758== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+\end{lstlisting}
+
+
+Los \textit{leaks} surgen de los semáforos que son utilizados tanto por el proceso vista como por el proceso maestro, pero solo aparecen como fugas en el proceso vista. Esto se debe a que los semáforos son cerrados por el proceso maestro, por lo tanto valgrind afirma que son fugas de memoria ya que exceden al proceso vista. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
