@@ -78,8 +78,19 @@ El sistema posee un archivo de tipo \textit{GNU make} que discrimina en la compi
 \section{Proceso Vista}
 El \textit{make} compila también de manera separada el proceso vista, para ejecutarlo se debe enviar el siguiente comando:
 \begin{lstlisting}
+/SO-TP1$ ./Binaries/view (PID)
+\end{lstlisting}
+Donde (PID) es el identificador del proceso maestro al que se quiere conectar. El PID es mostrado en pantalla cuando se ejecuta el proceso maestro. \\
+\indent Para facilitar el uso del programa vista, el programa maestro posee una opción \textit{-w} la cual espera hasta 60 segundos para que el usuario tenga tiempo de conectar la aplicación vista. Ejemplo de uso:
+\begin{lstlisting}
+/SO-TP1$ ./Binaries/run -w main.c 
 \end{lstlisting}
 
+\section{Testeo}
+El programa maestro posee la opción \textit{-t} para ejecutar los testeos unitarios del sistema. Ejemplo de uso:
+\begin{lstlisting}
+/SO-TP1$ ./Binaries/run -t
+\end{lstlisting}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Problemas y Resoluciones}
@@ -158,11 +169,18 @@ Podemos afirmar que para los casos vistos nuestros programas no presentan fugas 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Limitaciones}
-\section{Limitaciones del Sistema}
-max message
+\section{Limitaciones del Sistema e Implementación}
 
-\section{Limitaciones de la Implementación}
-Debido a que el programa reserva los argumentos -t y -w para la ejecución de modo de testeo y modo de espera, no se puede tener un archivo con este nombre como primer parámetro ya que interpretará el modo de ejecución y no un archivo para \textit{hashear}.
+\begin{itemize}
+\item max message
+
+\item  El sistema no cuenta con una búsqueda recursiva de archivos. Por ejemplo, pasar por parámetro ./* solo adjunta los archivos
+  pertenecientes al directorio actual, no aquellos que pertenezcan a los subdirectorios del mismo.
+
+\item Debido a que el programa reserva los argumentos -t y -w para la ejecución de modo de testeo y modo de espera, no se puede tener un archivo con este nombre como primer parámetro ya que interpretará el modo de ejecución y no un archivo para \textit{hashear}.
+
+\item   El sistema no puede calcular el hash de directorios, por una limitación de la herramienta de md5sum.
+\end{itemize}
 
 PRIVACIDAD DE LOS IPC
 

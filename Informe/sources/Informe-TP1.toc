@@ -8,6 +8,7 @@
 \contentsline {chapter}{\numberline {2}Utilizaci\IeC {\'o}n}{4}
 \contentsline {section}{\numberline {2.1}Compilaci\IeC {\'o}n y Ejecuci\IeC {\'o}n}{4}
 \contentsline {section}{\numberline {2.2}Proceso Vista}{4}
+\contentsline {section}{\numberline {2.3}Testeo}{4}
 \contentsline {chapter}{\numberline {3}Problemas y Resoluciones}{5}
 \contentsline {section}{\numberline {3.1}Proceso Maestro}{5}
 \contentsline {subsection}{\numberline {3.1.1}Problema de espera activo}{5}
@@ -19,7 +20,6 @@
 \contentsline {section}{\numberline {4.1}Unit testing}{7}
 \contentsline {section}{\numberline {4.2}Fugas de Memoria}{7}
 \contentsline {chapter}{\numberline {5}Limitaciones}{9}
-\contentsline {section}{\numberline {5.1}Limitaciones del Sistema}{9}
-\contentsline {section}{\numberline {5.2}Limitaciones de la Implementaci\IeC {\'o}n}{9}
+\contentsline {section}{\numberline {5.1}Limitaciones del Sistema e Implementaci\IeC {\'o}n}{9}
 \contentsline {chapter}{\numberline {6}Bibliograf\IeC {\'\i }a}{10}
 \contentsline {section}{\numberline {6.1}Fuentes}{10}
