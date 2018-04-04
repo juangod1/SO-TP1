@@ -66,9 +66,9 @@ int readMD5(const char* path, char* buffer)
 {
   if(!is_regular_file(path))
   {
-    printf("ERROR: \"%s\" ",path);
+    printf("Error: \"%s\" ",path);
     fflush(stdout);
-    perror("IS NOT A REGULAR FILE");
+    perror("is not a regular file");
     buffer = "Undetermined Hash due to error";
     return -1;
   }
@@ -77,7 +77,7 @@ int readMD5(const char* path, char* buffer)
   FILE *p = popen(cmd, "r");
   if(p==NULL)
   {
-    perror("UNRESOLVABLE POPEN ERROR : CODE FF517FDA1");
+    perror("Error: file descriptor is null");
     pclose(p);
     return -1;
   }
@@ -93,9 +93,8 @@ int readMD5(const char* path, char* buffer)
     ch = fgetc(p);
     if(!isxdigit(ch))
     {
-      perror("UNRESOLVABLE MD5SUM ERROR : CODE FF517FDA1");
-        pclose(p);
-
+      perror("Error: non hexadecimal digit");
+      pclose(p);
       return -1;
     }
     *(buffer++) = ch;

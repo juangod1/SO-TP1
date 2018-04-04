@@ -19,7 +19,6 @@
 #include "Tests/masterTest.h"
 #include "Tests/testBuffer.h"
 
-//Var for shared memory space. Cuando todo este funcionando, se pone su .h correspondiente
 #include <sys/types.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
@@ -78,7 +77,6 @@ void run(int argc, const char ** argv, int mode)
 
     while(hashCount < numberOfFiles)
     {
-        //This two variables can be moved to the beginning of "run".
         char hashBuffer[PATH_MAX+HASH_SIZE+1] = {0};
 
         switch(*((char *)bufferAddress+2))
