@@ -16,8 +16,7 @@
 \contentsline {section}{\numberline {3.3}Proceso Vista}{5}
 \contentsline {subsection}{\numberline {3.3.1}problema de espera activa}{5}
 \contentsline {chapter}{\numberline {4}Testing}{7}
-\contentsline {section}{\numberline {4.1}Sistema de Testing}{7}
-\contentsline {subsection}{\numberline {4.1.1}Filosofia de testeo}{7}
+\contentsline {section}{\numberline {4.1}Unit testing}{7}
 \contentsline {section}{\numberline {4.2}Fugas de Memoria}{7}
 \contentsline {chapter}{\numberline {5}Limitaciones}{9}
 \contentsline {section}{\numberline {5.1}Limitaciones del Sistema}{9}
