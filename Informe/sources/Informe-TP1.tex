@@ -89,16 +89,12 @@ es traída al entorno de la aplicación con la función fgets.
 \section{Proceso Vista}
 ssss
 \subsection{problema de espera activa}
-\emph{WIP}
-
-	Con esta libreria inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la funcion sem\_getvalue, la cual nos presento problemas en su ejecucion dentro del ciclo principal del master.  Siempre que la funcion era llamada dentro del ciclo, se generaba un segmentation fault. Debido a esto tuvimos que manejarnos sin ver los valores del semaphore por lo que finalmente decidimos hacer un hibrido entre los bytes reservados y los semaphores del API.
+	Con esta libreria inicialmente intentamos eliminar el uso de los bytes reservados en el buffer compartido. Para esto utilizamos la funcion sem\_getvalue, la cual nos presento problemas en su ejecucion dentro del ciclo principal del master. Siempre que la funcion era llamada dentro del ciclo, se generaba un segmentation fault. Debido a esto tuvimos que manejarnos sin ver los valores del semaphore por lo que finalmente decidimos hacer un hibrido entre los bytes reservados y los semaphores del API asi evitando la espera activa mediante la utilizacion de los semaforos de la api y utilizando los valores de los semaforos en el buffer de memoria compartida.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Testing}
-\section{Sistema de Testing}
-El Trabajo Práctico cuenta con una suite de testeos unitarios para garantizar un cierto nivel de robustez.
-\subsection{Filosofia de testeo}
+\section{Unit testing}
 Se decidio implementar unit tests para cubrir toda funcionalidad implementada por el TP que sea, por lo menos, mas de una mascara o algun agregado simlpe de una funcion de libreria standard o POSIX. 
 Esto se debe a que las estructuras de POSIX, tal como el sistema de queues y el sistema de semaforos que se proveen, resultan redundantes para testear debido a que estas funciones son de uso general y ya estan testeadas por fuera de nuestro trabajo practico. Por eso consideramos que todos los tests que meramente se resumian en un test de una funcion de POSIX no eran necesarios.
 
