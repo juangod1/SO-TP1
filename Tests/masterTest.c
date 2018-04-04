@@ -8,22 +8,59 @@
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
+#include "testlib.h"
 #include "masterTest.h"
 
+int queueIdentificators[2]={0};
 
-
-void createTestQueue(int *queueIDs)
+void testMasterRun()
 {
-  const char * msg = "test";
+  printf("Testing queue creation:");
+  givenNothing();
+  whenCreatingQueue();
+  thenQueueIsCreated();
+  printf("Testing item addition:");
+  givenNothing();
+  whenAddingItemToFileQueue();
+  thenFileQueueIsNotEmpty();
+  printf("Testing slave creation:");
+  createTestSlave();
+}
 
-  queueIDs=createMasterQueues(1,queueIDs);
-  if(sendMessage(msg, sizeof(msg) ,FILEQ_ID)==0 && !isEmpty(FILEQ_ID))
+void whenCreatingQueue()
+{
+  createMasterQueues(1, queueIdentificators);
+}
+
+void thenQueueIsCreated()
+{
+  if(queueIdentificators[0]!=0 || queueIdentificators[1]!=0)
   {
-    printf("Wrote \"test\" to queue\n");
+    ok();
   }
   else
   {
-    printf("Failed to write \"test\" to queue\n");
+    fail("Expected: non-0 queueIdentificators array, recieved: value 0 queueIdentificators");
+  }
+}
+
+void whenAddingItemToFileQueue()
+{
+  const char * msg = "test";
+  sendMessage(msg, sizeof(msg) ,queueIdentificators[0]);
+}
+
+void thenFileQueueIsNotEmpty()
+{
+  char destinationOfMessage[MAX_PATH_LEN];
+  getMessage(queueIdentificators[0], MAX_PATH_LEN, destinationOfMessage);
+  if(destinationOfMessage!=NULL)
+  {
+    ok();
+  }
+  else
+  {
+    fail("Expected: non-null buffer, received: null buffer");
   }
 }
 

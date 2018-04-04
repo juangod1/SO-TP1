@@ -41,7 +41,7 @@ void cleanBufferConnections(key_t key);
 void semaphoreInitiation(char * bufferAddress);
 void closeProgramConnections(sem_t * semSem, sem_t * visSem, key_t uniqueKeyPid, char* bufferAddress);
 
-void testModeRun(int * queueIDs);
+void testModeRun();
 
 void run(int argc, const char ** argv, int testMode);
 

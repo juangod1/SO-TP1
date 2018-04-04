@@ -18,7 +18,6 @@
 #include <sys/wait.h>
 #include "Tests/masterTest.h"
 #include "Tests/testBuffer.h"
-
 #include <sys/types.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
@@ -31,86 +30,81 @@ int connectionId;
 
 void run(int argc, const char ** argv, int mode)
 {
-    //BufferAdress for shared memory
-    char * bufferAddress;
+  if(mode==TEST)
+  {
+    testModeRun();
+    exit(1);
+  }
+  //BufferAdress for shared memory
+  char * bufferAddress;
 
-    key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
-    cleanBufferConnections(uniqueKeyPid);
-    createBufferConnection(uniqueKeyPid, &bufferAddress);
+  key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
+  cleanBufferConnections(uniqueKeyPid);
+  createBufferConnection(uniqueKeyPid, &bufferAddress);
 
-    sem_t * visSem;
-    sem_t * semSem;
-    openSemaphores(&visSem,&semSem);
+  sem_t * visSem;
+  sem_t * semSem;
 
-    int queueIDs[2]={0};
-    if(mode==TEST) //test mode
-    {
-      testModeRun(queueIDs);
-      exit(1);
-    }
+  int parametersOffset = ((mode==WAIT) ? 2 : 1 );// Due to flag existing or not existing
+  int hashCount = 0;
+  int numberOfFiles = argc - parametersOffset;
+  FILE *fileToWrite;
 
-    int parametersOffset = ((mode==WAIT) ? 2 : 1 );// Due to testing flag existing or not existing
-    int hashCount = 0;
-    int numberOfFiles = argc - parametersOffset;
-    FILE *fileToWrite;
-    fileToWrite =  fopen("HashDump/hashDump.txt","a");
+  int queueIDs[2]={0};
+  createMasterQueues(numberOfFiles,queueIDs);
+  fileToWrite =  fopen("HashDump/hashDump.txt","a");
 
-    createMasterQueues(numberOfFiles,queueIDs);
+  numberOfFiles=sendFilesToQueue(numberOfFiles,argv,argc,parametersOffset, queueIDs);
+  putchar('\n');
+  if(numberOfFiles<=0)
+  {
+      printf("Error: no programs are hashable\nExiting program...\n");
+      exit(-1);
+  }
 
-    numberOfFiles=sendFilesToQueue(numberOfFiles,argv,argc,parametersOffset, queueIDs);
+  createSlaves(numberOfFiles,0);
 
-    putchar('\n');
+  openSemaphores(&visSem,&semSem);
+  semaphoreInitiation(bufferAddress);
 
-    if(numberOfFiles<=0)
-    {
-        printf("Error: no programs are hashable\nExiting program...\n");
-        exit(-1);
-    }
+  if(mode==WAIT){
+    waitForViewSystem(uniqueKeyPid, bufferAddress);
+  }
 
-    createSlaves(numberOfFiles,0);
-
-    semaphoreInitiation(bufferAddress);
-
-    if(mode==WAIT){
-      waitForViewSystem(uniqueKeyPid, bufferAddress);
-    }
-
-    while(hashCount < numberOfFiles)
-    {
-        char hashBuffer[PATH_MAX+HASH_SIZE+1] = {0};
-
-        switch(*((char *)bufferAddress+2))
-        {
-            case RED:
-                cleanBuffer(bufferAddress,BUFFER_SIZE);
-                if(isEmpty(HASHQ_ID)){
-                  break;
-                }
-                if (getMessage(HASHQ_ID,HASH_SIZE+PATH_MAX,hashBuffer)>0){
-                    hashCount++;
-                }
-                memcpy(bufferAddress+3,hashBuffer,HASH_SIZE+PATH_MAX);
-                fprintf(fileToWrite,"%s\n",hashBuffer);
-                PROCESS_TURN_SEMAPHORE_BYTE = GREEN;
-                sem_post(semSem);
+  while(hashCount < numberOfFiles)
+  {
+      char hashBuffer[PATH_MAX+HASH_SIZE+1] = {0};
+      switch(*((char *)bufferAddress+2))
+      {
+          case RED:
+              cleanBuffer(bufferAddress,BUFFER_SIZE);
+              if(isEmpty(HASHQ_ID)){
                 break;
-            case GREEN:
-                if(VIEW_IS_CONNECTED_BYTE){
-                    sem_wait(visSem);
-                }
-                else
-                    PROCESS_TURN_SEMAPHORE_BYTE = RED;
-                break;
-            default:
-                perror("Illegal semaphore state ERROR");
-                exit(-1);
-        }
-    }
-    fclose(fileToWrite);
-    printf("Hashes written to \'HashDump/hashDump.txt\'\n");
+              }
+              if (getMessage(HASHQ_ID,HASH_SIZE+PATH_MAX,hashBuffer)>0){
+                  hashCount++;
+              }
+              memcpy(bufferAddress+3,hashBuffer,HASH_SIZE+PATH_MAX);
+              fprintf(fileToWrite,"%s\n",hashBuffer);
+              PROCESS_TURN_SEMAPHORE_BYTE = GREEN;
+              sem_post(semSem);
+              break;
+          case GREEN:
+              if(VIEW_IS_CONNECTED_BYTE){
+                  sem_wait(visSem);
+              }
+              else
+                  PROCESS_TURN_SEMAPHORE_BYTE = RED;
+              break;
+          default:
+              perror("Illegal semaphore state ERROR");
+              exit(-1);
+      }
+  }
+  fclose(fileToWrite);
+  printf("Hashes written to \'HashDump/hashDump.txt\'\n");
 
-    closeProgramConnections(semSem, visSem, uniqueKeyPid, bufferAddress);
-
+  closeProgramConnections(semSem, visSem, uniqueKeyPid, bufferAddress);
 }
 
 void semaphoreInitiation(char * bufferAddress)
@@ -133,12 +127,11 @@ void closeProgramConnections(sem_t * semSem, sem_t * visSem, key_t uniqueKeyPid,
   closeSemaphores(&visSem, &semSem);
 }
 
-void testModeRun(int * queueIDs)
+void testModeRun()
 {
   int * status=malloc(4); pid_t wpid;
   createTestBuffer();
-  createTestQueue(queueIDs);
-  createTestSlave();
+  testMasterRun();
   while ((wpid = wait(status)) > 0); //wait for all child processes
   fflush(stdout);
   closeFileQueue();
@@ -149,7 +142,6 @@ void testModeRun(int * queueIDs)
 int sendFilesToQueue(int numberOfFiles, const char** argv, int argc, int parametersOffset, int *queueIDs)
 {
   int numberOfFilesCopy=numberOfFiles;
-  // Queue files for slaves to poll
   for(int i=parametersOffset; i<argc; i++)
   {
       if(is_regular_file(argv[i]))
@@ -185,7 +177,7 @@ void  createSlaves(int numberOfFiles, int testMode)
 
     for(int i=0;i<numberOfSlaves;i++)
     {
-        if( (pid=fork()) == 0)// Child process
+        if( (pid=fork()) == 0)
         {
             if(execv("./Binaries/slave", parameters) == -1)
                 perror("execv ERROR");
@@ -197,13 +189,12 @@ void  createSlaves(int numberOfFiles, int testMode)
 
 void cleanBufferConnections(key_t key)
 {
-    //Removes the shared memory asigned previously
     char buff[10+INT_MAX%10];
     sprintf(buff,"ipcrm -M %d", (int)key);
     system(buff);
 }
 
-//El key que recibe tiene que ser el PID del proceso actual.
+
 void createBufferConnection(key_t key, char ** asignedBufferAddress)
 {
     //Attempting to create the shared memory
@@ -296,7 +287,6 @@ int * createMasterQueues(int numberOfFiles, int * queueDescriptorArray)
 
     queueDescriptorArray[0] = fileQueue;
     queueDescriptorArray[1] = hashQueue;
-
 
     return queueDescriptorArray;
 }

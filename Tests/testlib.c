@@ -4,6 +4,10 @@
 
 #include "testlib.h"
 
+void givenNothing()
+{
+}
+
 void checkIsNotNull(void * pointer)
 {
     if(pointer == NULL)
