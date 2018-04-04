@@ -43,7 +43,7 @@
 
 \chapter{Diseño}
 \section{Diseño del Sistema}
-dshfdshfdshfds
+El programa fue diseñado para linux
 \section{IPCs}
 \subsection{Message Queue}
 	El sistema utiliza dos \textit{message queues} del tipo POSIX (son más modernas que sus contrapartes SYSTEM V) en la intercomunicación de los procesos maestro y esclavo. El primero se utiliza para enviar los archivos que se requieren \textit{hashear} hacia los esclavos, mientras que el segundo se utiliza para enviar los \textit{hashes} ya procesados devuelta al proceso maestro. La utilidad de dicho IPC es una multicausalidad. Al ser una cola, el \textit{message queue} asegura el comportamiento FIFO, por lo que es ideal para enviar los \textit{hashes} de vuelta al proceso maestro, ya que asegura que el orden de llegada corresponde al orden de procesamiento. El \textit{message queue} también resulta adecuado para enviar los nombres de los archivos a los esclavos ya que los mensajes sirven como instrucciones atómicas: Los esclavos leen las instrucciones de la cola, cuando terminan, leen otra instrucción, y cuando está vacía la cola significa que el procesamiento concluyó. Todo esto se realiza sin gastar un solo ciclo de procesador del proceso maestro.
@@ -54,6 +54,7 @@ Visual Semaphore es un semáforo que informa si el proceso vista está corriendo
 Por último, Status Semaphore es un indicador del turno de cada proceso, 0 para el proceso maestro y 1 para el proceso vista. A partir de esto, los procesos maestro y vista evitan colisiones entre ellas. 
 
 Para evitar el \textit{busy waiting} utilizamos la librería de semáforos de POSIX. Decidimos hacer un híbrido entre los bytes reservados y los semaphores del API de POSIX. Guardamos los valores dentro de los bytes reservados y utilizamos los semáforos POSIX para bloquear o liberar los procesos cuando necesitan manejar una espera. Este híbrido fue implementado debido a problemas encontrados en la API de POSIX de semáforos. \textit{Léase: Sección 3.1.1}.
+\subsection{Memoria Compartida}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Utilización}
@@ -156,7 +157,8 @@ Podemos afirmar que para los casos vistos nuestros programas no presentan fugas 
 max message
 
 \section{Limitaciones de la Implementación}
-un archivo no se puede llamar -t -w
+un archivo no se puede llamar -t -w \\
+PRIVACIDAD DE LOS IPC
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

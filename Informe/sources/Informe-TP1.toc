@@ -4,6 +4,7 @@
 \contentsline {section}{\numberline {1.2}IPCs}{2}
 \contentsline {subsection}{\numberline {1.2.1}Message Queue}{2}
 \contentsline {subsection}{\numberline {1.2.2}Sem\IeC {\'a}foros}{2}
+\contentsline {subsection}{\numberline {1.2.3}Memoria Compartida}{3}
 \contentsline {chapter}{\numberline {2}Utilizaci\IeC {\'o}n}{4}
 \contentsline {section}{\numberline {2.1}Compilaci\IeC {\'o}n y Ejecuci\IeC {\'o}n}{4}
 \contentsline {section}{\numberline {2.2}Proceso Vista}{4}

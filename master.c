@@ -38,8 +38,7 @@ void run(int argc, const char ** argv, int mode)
   //BufferAdress for shared memory
   char * bufferAddress;
 
-  key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well
-  cleanBufferConnections(uniqueKeyPid);
+  key_t uniqueKeyPid = getpid();//The view will know the PID and will use it as well0
   createBufferConnection(uniqueKeyPid, &bufferAddress);
 
   sem_t * visSem;
